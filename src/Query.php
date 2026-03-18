@@ -89,7 +89,11 @@ final class Query
             throw new \InvalidArgumentException('Invalid type');
         }
 
-        $castBool = $treatBoolsAsInts ? static function ($v): int { return (int) $v; } : static function ($v): string { return $v ? 'true' : 'false'; };
+        $castBool = $treatBoolsAsInts ? static function ($v): int {
+            return (int) $v;
+        } : static function ($v): string {
+            return $v ? 'true' : 'false';
+        };
 
         $qs = '';
         foreach ($params as $k => $v) {

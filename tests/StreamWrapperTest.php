@@ -191,7 +191,9 @@ class StreamWrapperTest extends TestCase
 
     public function testWrappedNullSizedStreamStaysNullSized(): void
     {
-        $nullSizedStream = new Psr7\PumpStream(function () { return ''; });
+        $nullSizedStream = new Psr7\PumpStream(function () {
+            return '';
+        });
         $this->assertNull($nullSizedStream->getSize());
 
         $resource = StreamWrapper::getResource($nullSizedStream);

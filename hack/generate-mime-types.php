@@ -121,4 +121,4 @@ PHP;
 
 file_put_contents(__DIR__ . '/../src/MimeType.php', $output);
 
-echo "Generated src/MimeType.php with " . count($mimeTypes) . " extensions.\n";
+echo 'Generated src/MimeType.php with ' . count($mimeTypes) . " extensions.\n";
