@@ -61,7 +61,8 @@ final class LimitStream implements StreamInterface
     {
         if (null === ($length = $this->stream->getSize())) {
             return null;
-        } elseif ($this->limit === -1) {
+        }
+        if ($this->limit === -1) {
             return $length - $this->offset;
         }
 

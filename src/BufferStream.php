@@ -59,7 +59,7 @@ final class BufferStream implements StreamInterface
         return null;
     }
 
-    public function getSize(): ?int
+    public function getSize(): int
     {
         return strlen($this->buffer);
     }
@@ -122,7 +122,7 @@ final class BufferStream implements StreamInterface
     /**
      * Writes data to the buffer.
      */
-    public function write($string): int
+    public function write(string $string): int
     {
         $this->buffer .= $string;
 

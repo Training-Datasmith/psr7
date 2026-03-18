@@ -198,7 +198,7 @@ class Stream implements StreamInterface
         $this->seek(0);
     }
 
-    public function seek($offset, $whence = SEEK_SET): void
+    public function seek(string $offset, $whence = SEEK_SET): void
     {
         $whence = (int) $whence;
 
@@ -270,9 +270,11 @@ class Stream implements StreamInterface
     {
         if (!isset($this->stream)) {
             return $key ? null : [];
-        } elseif (!$key) {
+        }
+        if (!$key) {
             return $this->customMetadata + stream_get_meta_data($this->stream);
-        } elseif (isset($this->customMetadata[$key])) {
+        }
+        if (isset($this->customMetadata[$key])) {
             return $this->customMetadata[$key];
         }
 

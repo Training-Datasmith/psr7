@@ -235,7 +235,7 @@ class ServerRequest extends Request implements ServerRequestInterface
         }
 
         if (!$hasQuery && isset($_SERVER['QUERY_STRING'])) {
-            $uri = $uri->withQuery($_SERVER['QUERY_STRING']);
+            return $uri->withQuery($_SERVER['QUERY_STRING']);
         }
 
         return $uri;

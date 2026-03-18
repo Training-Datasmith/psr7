@@ -157,7 +157,8 @@ final class AppendStream implements StreamInterface
     {
         if (!$this->seekable) {
             throw new \RuntimeException('This AppendStream is not seekable');
-        } elseif ($whence !== SEEK_SET) {
+        }
+        if ($whence !== SEEK_SET) {
             throw new \RuntimeException('The AppendStream can only seek with SEEK_SET');
         }
 
@@ -238,10 +239,7 @@ final class AppendStream implements StreamInterface
         throw new \RuntimeException('Cannot write to an AppendStream');
     }
 
-    /**
-     * @return mixed
-     */
-    public function getMetadata($key = null)
+    public function getMetadata($key = null): ?array
     {
         return $key ? null : [];
     }

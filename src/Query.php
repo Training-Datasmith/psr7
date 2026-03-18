@@ -26,7 +26,7 @@ final class Query
         }
 
         if ($urlEncoding === true) {
-            $decoder = function ($value) {
+            $decoder = function ($value): string {
                 return rawurldecode(str_replace('+', ' ', (string) $value));
             };
         } elseif ($urlEncoding === PHP_QUERY_RFC3986) {
@@ -89,7 +89,7 @@ final class Query
             throw new \InvalidArgumentException('Invalid type');
         }
 
-        $castBool = $treatBoolsAsInts ? static function ($v) { return (int) $v; } : static function ($v) { return $v ? 'true' : 'false'; };
+        $castBool = $treatBoolsAsInts ? static function ($v): int { return (int) $v; } : static function ($v): string { return $v ? 'true' : 'false'; };
 
         $qs = '';
         foreach ($params as $k => $v) {

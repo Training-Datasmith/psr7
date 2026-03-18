@@ -175,7 +175,7 @@ final class Message
      */
     public static function parseRequestUri(string $path, array $headers): string
     {
-        $hostKey = array_filter(array_keys($headers), function ($k) {
+        $hostKey = array_filter(array_keys($headers), function ($k): bool {
             // Numeric array keys are converted to int by PHP.
             $k = (string) $k;
 

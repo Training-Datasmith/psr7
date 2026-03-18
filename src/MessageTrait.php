@@ -208,7 +208,7 @@ trait MessageTrait
      */
     private function trimAndValidateHeaderValues(array $values): array
     {
-        return array_map(function ($value) {
+        return array_map(function ($value): string {
             if (!is_scalar($value) && null !== $value) {
                 throw new \InvalidArgumentException(sprintf(
                     'Header value must be scalar or null but %s provided.',
