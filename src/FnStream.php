@@ -1,42 +1,32 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Guzzle_Http\Psr7;
 
-namespace GuzzleHttp\Psr7;
-
-use Psr\Http\Message\StreamInterface;
-
+use Psr\Http\Message\Stream_Interface;
 /**
  * Compose stream implementations based on a hash of functions.
  *
  * Allows for easy testing and extension of a provided stream without needing
  * to create a concrete class for a simple extension point.
  */
-#[\AllowDynamicProperties]
-final class FnStream implements StreamInterface
+#[\Allow_Dynamic_Properties]
+final class Fn_Stream implements Stream_Interface
 {
-    private const SLOTS = [
-        '__toString', 'close', 'detach', 'rewind',
-        'getSize', 'tell', 'eof', 'isSeekable', 'seek', 'isWritable', 'write',
-        'isReadable', 'read', 'getContents', 'getMetadata',
-    ];
-
+    private const SLOTS = ['__toString', 'close', 'detach', 'rewind', 'getSize', 'tell', 'eof', 'isSeekable', 'seek', 'isWritable', 'write', 'isReadable', 'read', 'getContents', 'getMetadata'];
     /** @var array<string, callable> */
     private $methods;
-
     /**
      * @param array<string, callable> $methods Hash of method name to a callable.
      */
     public function __construct(array $methods)
     {
         $this->methods = $methods;
-
         // Create the functions on the class
         foreach ($methods as $name => $fn) {
-            $this->{'_fn_'.$name} = $fn;
+            $this->{'_fn_' . $name} = $fn;
         }
     }
-
     /**
      * Lazily determine which methods are not implemented.
      *
@@ -44,10 +34,8 @@ final class FnStream implements StreamInterface
      */
     public function __get(string $name): void
     {
-        throw new \BadMethodCallException(str_replace('_fn_', '', $name)
-            .'() is not implemented in the FnStream');
+        throw new \BadMethodCallException(str_replace('_fn_', '', $name) . '() is not implemented in the FnStream');
     }
-
     /**
      * The close method is called on the underlying stream only if possible.
      */
@@ -57,7 +45,6 @@ final class FnStream implements StreamInterface
             ($this->_fn_close)();
         }
     }
-
     /**
      * An unserialize would allow the __destruct to run when the unserialized value goes out of scope.
      *
@@ -67,7 +54,6 @@ final class FnStream implements StreamInterface
     {
         throw new \LogicException('FnStream should never be unserialized');
     }
-
     /**
      * Adds custom functionality to an underlying stream by intercepting
      * specific method calls.
@@ -75,7 +61,7 @@ final class FnStream implements StreamInterface
      * @param StreamInterface         $stream  Stream to decorate
      * @param array<string, callable> $methods Hash of method name to a closure
      */
-    public static function decorate(StreamInterface $stream, array $methods): self
+    public static function decorate(Stream_Interface $stream, array $methods): self
     {
         // If any of the required methods were not provided, then simply
         // proxy to the decorated stream.
@@ -84,95 +70,78 @@ final class FnStream implements StreamInterface
             $callable = [$stream, $diff];
             $methods[$diff] = $callable;
         }
-
         return new self($methods);
     }
-
     public function __toString(): string
     {
         try {
             /** @var string */
-            return ($this->_fn___toString)();
+            return ($this->_fn___to_string)();
         } catch (\Throwable $e) {
             if (\PHP_VERSION_ID >= 70400) {
                 throw $e;
             }
             trigger_error(sprintf('%s::__toString exception: %s', self::class, (string) $e), E_USER_ERROR);
-
             return '';
         }
     }
-
     public function close(): void
     {
         ($this->_fn_close)();
     }
-
     public function detach()
     {
         return ($this->_fn_detach)();
     }
-
-    public function getSize(): ?int
+    public function get_size(): ?int
     {
-        return ($this->_fn_getSize)();
+        return ($this->_fn_get_size)();
     }
-
     public function tell(): int
     {
         return ($this->_fn_tell)();
     }
-
     public function eof(): bool
     {
         return ($this->_fn_eof)();
     }
-
-    public function isSeekable(): bool
+    public function is_seekable(): bool
     {
-        return ($this->_fn_isSeekable)();
+        return ($this->_fn_is_seekable)();
     }
-
     public function rewind(): void
     {
         ($this->_fn_rewind)();
     }
-
     public function seek($offset, $whence = SEEK_SET): void
     {
         ($this->_fn_seek)($offset, $whence);
     }
-
-    public function isWritable(): bool
+    public function is_writable(): bool
     {
-        return ($this->_fn_isWritable)();
+        return ($this->_fn_is_writable)();
     }
-
     public function write($string): int
     {
         return ($this->_fn_write)($string);
     }
-
-    public function isReadable(): bool
+    public function is_readable(): bool
     {
-        return ($this->_fn_isReadable)();
+        return ($this->_fn_is_readable)();
     }
-
     public function read($length): string
     {
         return ($this->_fn_read)($length);
     }
-
-    public function getContents(): string
+    public function get_contents(): string
     {
-        return ($this->_fn_getContents)();
+        return ($this->_fn_get_contents)();
     }
-
     /**
      * @return mixed
      */
-    public function getMetadata($key = null)
+    public function get_metadata($key = null)
     {
-        return ($this->_fn_getMetadata)($key);
+        return ($this->_fn_get_metadata)($key);
     }
 }

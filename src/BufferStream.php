@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Guzzle_Http\Psr7;
 
-namespace GuzzleHttp\Psr7;
-
-use Psr\Http\Message\StreamInterface;
-
+use Psr\Http\Message\Stream_Interface;
 /**
  * Provides a buffer stream that can be written to to fill a buffer, and read
  * from to remove bytes from the buffer.
@@ -14,14 +12,12 @@ use Psr\Http\Message\StreamInterface;
  * what the configured high water mark of the stream is, or the maximum
  * preferred size of the buffer.
  */
-final class BufferStream implements StreamInterface
+final class Buffer_Stream implements Stream_Interface
 {
     /** @var int */
     private $hwm;
-
     /** @var string */
     private $buffer = '';
-
     /**
      * @param int $hwm High water mark, representing the preferred maximum
      *                 buffer size. If the size of the buffer exceeds the high
@@ -33,80 +29,64 @@ final class BufferStream implements StreamInterface
     {
         $this->hwm = $hwm;
     }
-
     public function __toString(): string
     {
-        return $this->getContents();
+        return $this->get_contents();
     }
-
-    public function getContents(): string
+    public function get_contents(): string
     {
         $buffer = $this->buffer;
         $this->buffer = '';
-
         return $buffer;
     }
-
     public function close(): void
     {
         $this->buffer = '';
     }
-
     public function detach()
     {
         $this->close();
-
         return null;
     }
-
-    public function getSize(): int
+    public function get_size(): int
     {
         return strlen($this->buffer);
     }
-
-    public function isReadable(): bool
+    public function is_readable(): bool
     {
         return true;
     }
-
-    public function isWritable(): bool
+    public function is_writable(): bool
     {
         return true;
     }
-
-    public function isSeekable(): bool
+    public function is_seekable(): bool
     {
         return false;
     }
-
     public function rewind(): void
     {
         $this->seek(0);
     }
-
     public function seek($offset, $whence = SEEK_SET): void
     {
         throw new \RuntimeException('Cannot seek a BufferStream');
     }
-
     public function eof(): bool
     {
         return strlen($this->buffer) === 0;
     }
-
     public function tell(): int
     {
         throw new \RuntimeException('Cannot determine the position of a BufferStream');
     }
-
     /**
      * Reads data from the buffer.
      */
     public function read($length): string
     {
-        $currentLength = strlen($this->buffer);
-
-        if ($length >= $currentLength) {
+        $current_length = strlen($this->buffer);
+        if ($length >= $current_length) {
             // No need to slice the buffer because we don't have enough data.
             $result = $this->buffer;
             $this->buffer = '';
@@ -115,33 +95,27 @@ final class BufferStream implements StreamInterface
             $result = substr($this->buffer, 0, $length);
             $this->buffer = substr($this->buffer, $length);
         }
-
         return $result;
     }
-
     /**
      * Writes data to the buffer.
      */
     public function write(string $string): int
     {
         $this->buffer .= $string;
-
         if (strlen($this->buffer) >= $this->hwm) {
             return 0;
         }
-
         return strlen($string);
     }
-
     /**
      * @return mixed
      */
-    public function getMetadata($key = null)
+    public function get_metadata($key = null)
     {
         if ($key === 'hwm') {
             return $this->hwm;
         }
-
         return $key ? null : [];
     }
 }

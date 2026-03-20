@@ -1,27 +1,22 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Guzzle_Http\Psr7;
 
-namespace GuzzleHttp\Psr7;
-
-use Psr\Http\Message\StreamInterface;
-
+use Psr\Http\Message\Stream_Interface;
 /**
  * Stream decorator that prevents a stream from being seeked.
  */
-final class NoSeekStream implements StreamInterface
+final class No_Seek_Stream implements Stream_Interface
 {
-    use StreamDecoratorTrait;
-
+    use Stream_Decorator_Trait;
     /** @var StreamInterface */
     private $stream;
-
     public function seek($offset, $whence = SEEK_SET): void
     {
         throw new \RuntimeException('Cannot seek a NoSeekStream');
     }
-
-    public function isSeekable(): bool
+    public function is_seekable(): bool
     {
         return false;
     }
