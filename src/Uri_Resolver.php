@@ -1,9 +1,11 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace Guzzle_Http\Psr7;
 
-use Psr\Http\Message\Uri_Interface;
+use Psr\Http\Message\UriInterface;
+
 /**
  * Resolves a URI reference in the context of a base URI and the opposite way.
  *
@@ -23,6 +25,7 @@ final class Uri_Resolver
         if ($path === '' || $path === '/') {
             return $path;
         }
+
         $results = [];
         $segments = explode('/', $path);
         foreach ($segments as $segment) {
@@ -32,145 +35,175 @@ final class Uri_Resolver
                 $results[] = $segment;
             }
         }
-        $new_path = implode('/', $results);
-        if ($path[0] === '/' && (!isset($new_path[0]) || $new_path[0] !== '/')) {
+
+        $newPath = implode('/', $results);
+
+        if ($path[0] === '/' && (!isset($newPath[0]) || $newPath[0] !== '/')) {
             // Re-add the leading slash if necessary for cases like "/.."
-            $new_path = '/' . $new_path;
-        } elseif ($new_path !== '' && ($segment === '.' || $segment === '..')) {
+            $newPath = '/'.$newPath;
+        } elseif ($newPath !== '' && ($segment === '.' || $segment === '..')) {
             // Add the trailing slash if necessary
             // If newPath is not empty, then $segment must be set and is the last segment from the foreach
-            $new_path .= '/';
+            $newPath .= '/';
         }
-        return $new_path;
+
+        return $newPath;
     }
+
     /**
      * Converts the relative URI into a new URI that is resolved against the base URI.
      *
      * @see https://datatracker.ietf.org/doc/html/rfc3986#section-5.2
      */
-    public static function resolve(Uri_Interface $base, Uri_Interface $rel): Uri_Interface
+    public static function resolve(UriInterface $base, UriInterface $rel): UriInterface
     {
         if ((string) $rel === '') {
             // we can simply return the same base URI instance for this same-document reference
             return $base;
         }
-        if ($rel->get_scheme() != '') {
-            return $rel->with_path(self::remove_dot_segments($rel->get_path()));
+
+        if ($rel->getScheme() != '') {
+            return $rel->withPath(self::remove_dot_segments($rel->getPath()));
         }
-        if ($rel->get_authority() != '') {
-            $target_authority = $rel->get_authority();
-            $target_path = self::remove_dot_segments($rel->get_path());
-            $target_query = $rel->get_query();
+
+        if ($rel->getAuthority() != '') {
+            $targetAuthority = $rel->getAuthority();
+            $targetPath = self::remove_dot_segments($rel->getPath());
+            $targetQuery = $rel->getQuery();
         } else {
-            $target_authority = $base->get_authority();
-            if ($rel->get_path() === '') {
-                $target_path = $base->get_path();
-                $target_query = $rel->get_query() != '' ? $rel->get_query() : $base->get_query();
+            $targetAuthority = $base->getAuthority();
+            if ($rel->getPath() === '') {
+                $targetPath = $base->getPath();
+                $targetQuery = $rel->getQuery() != '' ? $rel->getQuery() : $base->getQuery();
             } else {
-                if ($rel->get_path()[0] === '/') {
-                    $target_path = $rel->get_path();
-                } else if ($target_authority != '' && $base->get_path() === '') {
-                    $target_path = '/' . $rel->get_path();
+                if ($rel->getPath()[0] === '/') {
+                    $targetPath = $rel->getPath();
                 } else {
-                    $last_slash_pos = strrpos($base->get_path(), '/');
-                    if ($last_slash_pos === false) {
-                        $target_path = $rel->get_path();
+                    if ($targetAuthority != '' && $base->getPath() === '') {
+                        $targetPath = '/'.$rel->getPath();
                     } else {
-                        $target_path = substr($base->get_path(), 0, $last_slash_pos + 1) . $rel->get_path();
+                        $lastSlashPos = strrpos($base->getPath(), '/');
+                        if ($lastSlashPos === false) {
+                            $targetPath = $rel->getPath();
+                        } else {
+                            $targetPath = substr($base->getPath(), 0, $lastSlashPos + 1).$rel->getPath();
+                        }
                     }
                 }
-                $target_path = self::remove_dot_segments($target_path);
-                $target_query = $rel->get_query();
+                $targetPath = self::remove_dot_segments($targetPath);
+                $targetQuery = $rel->getQuery();
             }
         }
-        return new Uri(Uri::compose_components($base->get_scheme(), $target_authority, $target_path, $target_query, $rel->get_fragment()));
+
+        return new Uri(Uri::compose_components(
+            $base->getScheme(),
+            $targetAuthority,
+            $targetPath,
+            $targetQuery,
+            $rel->getFragment()
+        ));
     }
+
     /**
      * Returns the target URI as a relative reference from the base URI.
      *
      * This method is the counterpart to resolve():
      *
-     *    (string) $target === (string) UriResolver::resolve($base, UriResolver::relativize($base, $target))
+     *    (string) $target === (string) Uri_Resolver::resolve($base, Uri_Resolver::relativize($base, $target))
      *
      * One use-case is to use the current request URI as base URI and then generate relative links in your documents
      * to reduce the document size or offer self-contained downloadable document archives.
      *
      *    $base = new Uri('http://example.com/a/b/');
-     *    echo UriResolver::relativize($base, new Uri('http://example.com/a/b/c'));  // prints 'c'.
-     *    echo UriResolver::relativize($base, new Uri('http://example.com/a/x/y'));  // prints '../x/y'.
-     *    echo UriResolver::relativize($base, new Uri('http://example.com/a/b/?q')); // prints '?q'.
-     *    echo UriResolver::relativize($base, new Uri('http://example.org/a/b/'));   // prints '//example.org/a/b/'.
+     *    echo Uri_Resolver::relativize($base, new Uri('http://example.com/a/b/c'));  // prints 'c'.
+     *    echo Uri_Resolver::relativize($base, new Uri('http://example.com/a/x/y'));  // prints '../x/y'.
+     *    echo Uri_Resolver::relativize($base, new Uri('http://example.com/a/b/?q')); // prints '?q'.
+     *    echo Uri_Resolver::relativize($base, new Uri('http://example.org/a/b/'));   // prints '//example.org/a/b/'.
      *
      * This method also accepts a target that is already relative and will try to relativize it further. Only a
      * relative-path reference will be returned as-is.
      *
-     *    echo UriResolver::relativize($base, new Uri('/a/b/c'));  // prints 'c' as well
+     *    echo Uri_Resolver::relativize($base, new Uri('/a/b/c'));  // prints 'c' as well
      */
-    public static function relativize(Uri_Interface $base, Uri_Interface $target): Uri_Interface
+    public static function relativize(UriInterface $base, UriInterface $target): UriInterface
     {
-        if ($target->get_scheme() !== '' && ($base->get_scheme() !== $target->get_scheme() || $target->get_authority() === '' && $base->get_authority() !== '')) {
+        if ($target->getScheme() !== ''
+            && ($base->getScheme() !== $target->getScheme() || $target->getAuthority() === '' && $base->getAuthority() !== '')
+        ) {
             return $target;
         }
+
         if (Uri::is_relative_path_reference($target)) {
             // As the target is already highly relative we return it as-is. It would be possible to resolve
             // the target with `$target = self::resolve($base, $target);` and then try make it more relative
             // by removing a duplicate query. But let's not do that automatically.
             return $target;
         }
-        if ($target->get_authority() !== '' && $base->get_authority() !== $target->get_authority()) {
-            return $target->with_scheme('');
+
+        if ($target->getAuthority() !== '' && $base->getAuthority() !== $target->getAuthority()) {
+            return $target->withScheme('');
         }
+
         // We must remove the path before removing the authority because if the path starts with two slashes, the URI
         // would turn invalid. And we also cannot set a relative path before removing the authority, as that is also
         // invalid.
-        $empty_path_uri = $target->with_scheme('')->with_path('')->with_user_info('')->with_port(null)->with_host('');
-        if ($base->get_path() !== $target->get_path()) {
-            return $empty_path_uri->with_path(self::get_relative_path($base, $target));
+        $emptyPathUri = $target->withScheme('')->withPath('')->withUserInfo('')->withPort(null)->withHost('');
+
+        if ($base->getPath() !== $target->getPath()) {
+            return $emptyPathUri->withPath(self::get_relative_path($base, $target));
         }
-        if ($base->get_query() === $target->get_query()) {
+
+        if ($base->getQuery() === $target->getQuery()) {
             // Only the target fragment is left. And it must be returned even if base and target fragment are the same.
-            return $empty_path_uri->with_query('');
+            return $emptyPathUri->withQuery('');
         }
+
         // If the base URI has a query but the target has none, we cannot return an empty path reference as it would
         // inherit the base query component when resolving.
-        if ($target->get_query() === '') {
-            $segments = explode('/', $target->get_path());
+        if ($target->getQuery() === '') {
+            $segments = explode('/', $target->getPath());
             /** @var string $lastSegment */
-            $last_segment = end($segments);
-            return $empty_path_uri->with_path($last_segment === '' ? './' : $last_segment);
+            $lastSegment = end($segments);
+
+            return $emptyPathUri->withPath($lastSegment === '' ? './' : $lastSegment);
         }
-        return $empty_path_uri;
+
+        return $emptyPathUri;
     }
-    private static function get_relative_path(Uri_Interface $base, Uri_Interface $target): string
+
+    private static function get_relative_path(UriInterface $base, UriInterface $target): string
     {
-        $source_segments = explode('/', $base->get_path());
-        $target_segments = explode('/', $target->get_path());
-        array_pop($source_segments);
-        $target_last_segment = array_pop($target_segments);
-        foreach ($source_segments as $i => $segment) {
-            if (isset($target_segments[$i]) && $segment === $target_segments[$i]) {
-                unset($source_segments[$i], $target_segments[$i]);
+        $sourceSegments = explode('/', $base->getPath());
+        $targetSegments = explode('/', $target->getPath());
+        array_pop($sourceSegments);
+        $targetLastSegment = array_pop($targetSegments);
+        foreach ($sourceSegments as $i => $segment) {
+            if (isset($targetSegments[$i]) && $segment === $targetSegments[$i]) {
+                unset($sourceSegments[$i], $targetSegments[$i]);
             } else {
                 break;
             }
         }
-        $target_segments[] = $target_last_segment;
-        $relative_path = str_repeat('../', count($source_segments)) . implode('/', $target_segments);
+        $targetSegments[] = $targetLastSegment;
+        $relativePath = str_repeat('../', count($sourceSegments)).implode('/', $targetSegments);
+
         // A reference to am empty last segment or an empty first sub-segment must be prefixed with "./".
         // This also applies to a segment with a colon character (e.g., "file:colon") that cannot be used
         // as the first segment of a relative-path reference, as it would be mistaken for a scheme name.
-        if (false !== strpos(explode('/', $relative_path, 2)[0], ':')) {
-            $relative_path = "./{$relative_path}";
-        } elseif ('/' === $relative_path[0]) {
-            if ($base->get_authority() != '' && $base->get_path() === '') {
+        if ('' === $relativePath || false !== strpos(explode('/', $relativePath, 2)[0], ':')) {
+            $relativePath = "./$relativePath";
+        } elseif ('/' === $relativePath[0]) {
+            if ($base->getAuthority() != '' && $base->getPath() === '') {
                 // In this case an extra slash is added by resolve() automatically. So we must not add one here.
-                $relative_path = ".{$relative_path}";
+                $relativePath = ".$relativePath";
             } else {
-                $relative_path = "./{$relative_path}";
+                $relativePath = "./$relativePath";
             }
         }
-        return $relative_path;
+
+        return $relativePath;
     }
+
     private function __construct()
     {
         // cannot be instantiated

@@ -1,6 +1,7 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace Guzzle_Http\Psr7;
 
 final class Header
@@ -17,6 +18,7 @@ final class Header
     {
         static $trimmed = "\"'  \n\t\r";
         $params = $matches = [];
+
         foreach ((array) $header as $value) {
             foreach (self::split_list($value) as $val) {
                 $part = [];
@@ -35,15 +37,17 @@ final class Header
                 }
             }
         }
+
         return $params;
     }
+
     /**
      * Converts an array of header values that may contain comma separated
      * headers into an array of headers with no comma separated values.
      *
      * @param string|array $header Header to normalize.
      *
-     * @deprecated Use self::splitList() instead.
+     * @deprecated Use self::split_list() instead.
      */
     public static function normalize($header): array
     {
@@ -53,8 +57,10 @@ final class Header
                 $result[] = $parsed;
             }
         }
+
         return $result;
     }
+
     /**
      * Splits a HTTP header defined to contain a comma-separated list into
      * each individual value. Empty values will be removed.
@@ -64,7 +70,7 @@ final class Header
      * This method must not be used to parse headers that are not defined as
      * a list, such as 'user-agent' or 'set-cookie'.
      *
-     * @param string|string[] $values Header value as returned by MessageInterface::getHeader()
+     * @param string|string[] $values Header value as returned by MessageInterface::get_header()
      *
      * @return string[]
      */
@@ -73,45 +79,56 @@ final class Header
         if (!\is_array($values)) {
             $values = [$values];
         }
+
         $result = [];
         foreach ($values as $value) {
             if (!\is_string($value)) {
                 throw new \TypeError('$header must either be a string or an array containing strings.');
             }
+
             $v = '';
-            $is_quoted = false;
-            $is_escaped = false;
+            $isQuoted = false;
+            $isEscaped = false;
             for ($i = 0, $max = \strlen($value); $i < $max; ++$i) {
-                if ($is_escaped) {
+                if ($isEscaped) {
                     $v .= $value[$i];
-                    $is_escaped = false;
+                    $isEscaped = false;
+
                     continue;
                 }
-                if (!$is_quoted && $value[$i] === ',') {
+
+                if (!$isQuoted && $value[$i] === ',') {
                     $v = \trim($v);
                     if ($v !== '') {
                         $result[] = $v;
                     }
+
                     $v = '';
                     continue;
                 }
-                if ($is_quoted && $value[$i] === '\\') {
-                    $is_escaped = true;
+
+                if ($isQuoted && $value[$i] === '\\') {
+                    $isEscaped = true;
                     $v .= $value[$i];
+
                     continue;
                 }
                 if ($value[$i] === '"') {
-                    $is_quoted = !$is_quoted;
+                    $isQuoted = !$isQuoted;
                     $v .= $value[$i];
+
                     continue;
                 }
+
                 $v .= $value[$i];
             }
+
             $v = \trim($v);
             if ($v !== '') {
                 $result[] = $v;
             }
         }
+
         return $result;
     }
 }

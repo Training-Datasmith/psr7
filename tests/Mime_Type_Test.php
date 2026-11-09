@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7;
+use Guzzle_Http\Psr7;
 use PHPUnit\Framework\TestCase;
 
-class MimeTypeTest extends TestCase
+class Mime_TypeTest extends TestCase
 {
     public function testDetermineFromExtension(): void
     {
-        self::assertNull(Psr7\MimeType::fromExtension('not-a-real-extension'));
-        self::assertSame('application/json', Psr7\MimeType::fromExtension('json'));
+        self::assertNull(Psr7\Mime_Type::from_extension('not-a-real-extension'));
+        self::assertSame('application/json', Psr7\Mime_Type::from_extension('json'));
     }
 
     public function testDetermineFromFilename(): void
     {
         self::assertSame(
             'image/jpeg',
-            Psr7\MimeType::fromFilename('/tmp/images/IMG034821.JPEG')
+            Psr7\Mime_Type::from_filename('/tmp/images/IMG034821.JPEG')
         );
     }
 }

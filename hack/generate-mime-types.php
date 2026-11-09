@@ -81,9 +81,9 @@ $output = <<<'PHP'
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Psr7;
+namespace Guzzle_Http\Psr7;
 
-final class MimeType
+final class Mime_Type
 {
     private const MIME_TYPES = [
 
@@ -101,9 +101,9 @@ $output .= <<<'PHP'
      *
      * @see https://raw.githubusercontent.com/jshttp/mime-db/master/db.json
      */
-    public static function fromFilename(string $filename): ?string
+    public static function from_filename(string $filename): ?string
     {
-        return self::fromExtension(pathinfo($filename, PATHINFO_EXTENSION));
+        return self::from_extension(pathinfo($filename, PATHINFO_EXTENSION));
     }
 
     /**
@@ -111,7 +111,7 @@ $output .= <<<'PHP'
      *
      * @see https://raw.githubusercontent.com/jshttp/mime-db/master/db.json
      */
-    public static function fromExtension(string $extension): ?string
+    public static function from_extension(string $extension): ?string
     {
         return self::MIME_TYPES[strtolower($extension)] ?? null;
     }
@@ -119,6 +119,6 @@ $output .= <<<'PHP'
 
 PHP;
 
-file_put_contents(__DIR__ . '/../src/MimeType.php', $output);
+file_put_contents(__DIR__ . '/../src/Mime_Type.php', $output);
 
-echo 'Generated src/MimeType.php with ' . count($mimeTypes) . " extensions.\n";
+echo 'Generated src/Mime_Type.php with ' . count($mimeTypes) . " extensions.\n";

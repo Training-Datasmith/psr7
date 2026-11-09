@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7;
-use GuzzleHttp\Psr7\FnStream;
+use Guzzle_Http\Psr7;
+use Guzzle_Http\Psr7\Fn_Stream;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \GuzzleHttp\Psr7\FnStream
+ * @covers \Guzzle_Http\Psr7\Fn_Stream
  */
-class FnStreamTest extends TestCase
+class Fn_Stream_Test extends TestCase
 {
     public function testThrowsWhenNotImplemented(): void
     {
         $this->expectException(\BadMethodCallException::class);
-        $this->expectExceptionMessage('seek() is not implemented in the FnStream');
-        (new FnStream([]))->seek(1);
+        $this->expectExceptionMessage('seek() is not implemented in the Fn_Stream');
+        (new Fn_Stream([]))->seek(1);
     }
 
     public function testProxiesToFunction(): void
     {
-        $s = new FnStream([
+        $s = new Fn_Stream([
             'read' => function ($len) {
                 $this->assertSame(3, $len);
 
@@ -36,7 +36,7 @@ class FnStreamTest extends TestCase
     public function testCanCloseOnDestruct(): void
     {
         $called = false;
-        $s = new FnStream([
+        $s = new Fn_Stream([
             'close' => function () use (&$called): void {
                 $called = true;
             },
@@ -47,15 +47,15 @@ class FnStreamTest extends TestCase
 
     public function testDoesNotRequireClose(): void
     {
-        $s = new FnStream([]);
+        $s = new Fn_Stream([]);
         unset($s);
         self::assertTrue(true); // strict mode requires an assertion
     }
 
     public function testDecoratesStream(): void
     {
-        $a = Psr7\Utils::streamFor('foo');
-        $b = FnStream::decorate($a, []);
+        $a = Psr7\Utils::stream_for('foo');
+        $b = Fn_Stream::decorate($a, []);
         self::assertSame(3, $b->getSize());
         self::assertSame($b->isWritable(), true);
         self::assertSame($b->isReadable(), true);
@@ -81,8 +81,8 @@ class FnStreamTest extends TestCase
     public function testDecoratesWithCustomizations(): void
     {
         $called = false;
-        $a = Psr7\Utils::streamFor('foo');
-        $b = FnStream::decorate($a, [
+        $a = Psr7\Utils::stream_for('foo');
+        $b = Fn_Stream::decorate($a, [
             'read' => function ($len) use (&$called, $a) {
                 $called = true;
 
@@ -95,10 +95,10 @@ class FnStreamTest extends TestCase
 
     public function testDoNotAllowUnserialization(): void
     {
-        $a = new FnStream([]);
+        $a = new Fn_Stream([]);
         $b = serialize($a);
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('FnStream should never be unserialized');
+        $this->expectExceptionMessage('Fn_Stream should never be unserialized');
         unserialize($b);
     }
 
@@ -107,7 +107,7 @@ class FnStreamTest extends TestCase
      */
     public function testThatConvertingStreamToStringWillTriggerErrorAndWillReturnEmptyString(): void
     {
-        $a = new FnStream([
+        $a = new Fn_Stream([
             '__toString' => function (): void {
                 throw new \Exception();
             },
@@ -123,6 +123,6 @@ class FnStreamTest extends TestCase
 
         self::assertCount(1, $errors);
         self::assertSame(E_USER_ERROR, $errors[0]['number']);
-        self::assertStringStartsWith('GuzzleHttp\Psr7\FnStream::__toString exception:', $errors[0]['message']);
+        self::assertStringStartsWith('Guzzle_Http\Psr7\Fn_Stream::__toString exception:', $errors[0]['message']);
     }
 }

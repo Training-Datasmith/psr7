@@ -4,187 +4,187 @@ parameters:
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
-			path: src/AppendStream.php
+			path: src/Append_Stream.php
 
 		-
-			message: '#^Method GuzzleHttp\\Psr7\\BufferStream\:\:getSize\(\) never returns null so it can be removed from the return type\.$#'
+			message: '#^Method GuzzleHttp\\Psr7\\Buffer_Stream\:\:getSize\(\) never returns null so it can be removed from the return type\.$#'
 			identifier: return.unusedType
 			count: 1
-			path: src/BufferStream.php
+			path: src/Buffer_Stream.php
 
 		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
-			path: src/CachingStream.php
+			path: src/Caching_Stream.php
 
 		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
-			path: src/DroppingStream.php
+			path: src/Dropping_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn___toString\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn___toString\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn_close\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn_close\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn_detach\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn_detach\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn_eof\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn_eof\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn_getContents\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn_getContents\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn_getMetadata\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn_getMetadata\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn_getSize\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn_getSize\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn_isReadable\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn_isReadable\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn_isSeekable\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn_isSeekable\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn_isWritable\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn_isWritable\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn_read\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn_read\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn_rewind\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn_rewind\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn_seek\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn_seek\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn_tell\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn_tell\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\FnStream\:\:\$_fn_write\.$#'
+			message: '#^Access to an undefined property GuzzleHttp\\Psr7\\Fn_Stream\:\:\$_fn_write\.$#'
 			identifier: property.notFound
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Method GuzzleHttp\\Psr7\\FnStream\:\:detach\(\) should return resource\|null but returns mixed\.$#'
+			message: '#^Method GuzzleHttp\\Psr7\\Fn_Stream\:\:detach\(\) should return resource\|null but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Method GuzzleHttp\\Psr7\\FnStream\:\:eof\(\) should return bool but returns mixed\.$#'
+			message: '#^Method GuzzleHttp\\Psr7\\Fn_Stream\:\:eof\(\) should return bool but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Method GuzzleHttp\\Psr7\\FnStream\:\:getContents\(\) should return string but returns mixed\.$#'
+			message: '#^Method GuzzleHttp\\Psr7\\Fn_Stream\:\:getContents\(\) should return string but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Method GuzzleHttp\\Psr7\\FnStream\:\:getSize\(\) should return int\|null but returns mixed\.$#'
+			message: '#^Method GuzzleHttp\\Psr7\\Fn_Stream\:\:getSize\(\) should return int\|null but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Method GuzzleHttp\\Psr7\\FnStream\:\:isReadable\(\) should return bool but returns mixed\.$#'
+			message: '#^Method GuzzleHttp\\Psr7\\Fn_Stream\:\:isReadable\(\) should return bool but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Method GuzzleHttp\\Psr7\\FnStream\:\:isSeekable\(\) should return bool but returns mixed\.$#'
+			message: '#^Method GuzzleHttp\\Psr7\\Fn_Stream\:\:isSeekable\(\) should return bool but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Method GuzzleHttp\\Psr7\\FnStream\:\:isWritable\(\) should return bool but returns mixed\.$#'
+			message: '#^Method GuzzleHttp\\Psr7\\Fn_Stream\:\:isWritable\(\) should return bool but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Method GuzzleHttp\\Psr7\\FnStream\:\:read\(\) should return string but returns mixed\.$#'
+			message: '#^Method GuzzleHttp\\Psr7\\Fn_Stream\:\:read\(\) should return string but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Method GuzzleHttp\\Psr7\\FnStream\:\:tell\(\) should return int but returns mixed\.$#'
+			message: '#^Method GuzzleHttp\\Psr7\\Fn_Stream\:\:tell\(\) should return int but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
-			message: '#^Method GuzzleHttp\\Psr7\\FnStream\:\:write\(\) should return int but returns mixed\.$#'
+			message: '#^Method GuzzleHttp\\Psr7\\Fn_Stream\:\:write\(\) should return int but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
 			message: '#^Trying to invoke mixed but it''s not a callable\.$#'
 			identifier: callable.nonCallable
 			count: 16
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
-			path: src/FnStream.php
+			path: src/Fn_Stream.php
 
 		-
 			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
@@ -208,25 +208,25 @@ parameters:
 			message: '#^Parameter \#1 \$method of class GuzzleHttp\\Psr7\\ServerRequest constructor expects string, mixed given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/HttpFactory.php
+			path: src/Http_Factory.php
 
 		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
-			path: src/InflateStream.php
+			path: src/Inflate_Stream.php
 
 		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
-			path: src/LazyOpenStream.php
+			path: src/Lazy_Open_Stream.php
 
 		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
-			path: src/LimitStream.php
+			path: src/Limit_Stream.php
 
 		-
 			message: '#^Binary operation "\." between ''Invalid response…'' and mixed results in an error\.$#'
@@ -331,40 +331,40 @@ parameters:
 			path: src/Message.php
 
 		-
-			message: '#^Parameter \#1 \$resource of static method GuzzleHttp\\Psr7\\Utils\:\:streamFor\(\) expects bool\|\(callable\(\)\: mixed\)\|float\|int\|Iterator\|Psr\\Http\\Message\\StreamInterface\|resource\|string\|null, mixed given\.$#'
+			message: '#^Parameter \#1 \$resource of static method GuzzleHttp\\Psr7\\Utils\:\:stream_for\(\) expects bool\|\(callable\(\)\: mixed\)\|float\|int\|Iterator\|Psr\\Http\\Message\\StreamInterface\|resource\|string\|null, mixed given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/MultipartStream.php
+			path: src/Multipart_Stream.php
 
 		-
-			message: '#^Parameter \#3 \$filename of method GuzzleHttp\\Psr7\\MultipartStream\:\:createElement\(\) expects string\|null, mixed given\.$#'
+			message: '#^Parameter \#3 \$filename of method GuzzleHttp\\Psr7\\Multipart_Stream\:\:createElement\(\) expects string\|null, mixed given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/MultipartStream.php
+			path: src/Multipart_Stream.php
 
 		-
-			message: '#^Parameter \#4 \$headers of method GuzzleHttp\\Psr7\\MultipartStream\:\:createElement\(\) expects array\<string\>, mixed given\.$#'
+			message: '#^Parameter \#4 \$headers of method GuzzleHttp\\Psr7\\Multipart_Stream\:\:createElement\(\) expects array\<string\>, mixed given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/MultipartStream.php
+			path: src/Multipart_Stream.php
 
 		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
-			path: src/MultipartStream.php
+			path: src/Multipart_Stream.php
 
 		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
-			path: src/NoSeekStream.php
+			path: src/No_Seek_Stream.php
 
 		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
-			path: src/PumpStream.php
+			path: src/Pump_Stream.php
 
 		-
 			message: '#^Cannot cast mixed to int\.$#'
@@ -457,13 +457,13 @@ parameters:
 			path: src/ServerRequest.php
 
 		-
-			message: '#^Parameter \#4 \$clientFilename of class GuzzleHttp\\Psr7\\UploadedFile constructor expects string\|null, mixed given\.$#'
+			message: '#^Parameter \#4 \$client_filename of class GuzzleHttp\\Psr7\\UploadedFile constructor expects string\|null, mixed given\.$#'
 			identifier: argument.type
 			count: 1
 			path: src/ServerRequest.php
 
 		-
-			message: '#^Parameter \#5 \$clientMediaType of class GuzzleHttp\\Psr7\\UploadedFile constructor expects string\|null, mixed given\.$#'
+			message: '#^Parameter \#5 \$client_media_type of class GuzzleHttp\\Psr7\\UploadedFile constructor expects string\|null, mixed given\.$#'
 			identifier: argument.type
 			count: 1
 			path: src/ServerRequest.php
@@ -496,31 +496,31 @@ parameters:
 			message: '#^Cannot access offset ''stream'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
-			path: src/StreamWrapper.php
+			path: src/Stream_Wrapper.php
 
 		-
 			message: '#^Cannot access offset string on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
-			path: src/StreamWrapper.php
+			path: src/Stream_Wrapper.php
 
 		-
-			message: '#^Method GuzzleHttp\\Psr7\\StreamWrapper\:\:getResource\(\) should return resource but returns resource\|false\.$#'
+			message: '#^Method GuzzleHttp\\Psr7\\Stream_Wrapper\:\:getResource\(\) should return resource but returns resource\|false\.$#'
 			identifier: return.type
 			count: 1
-			path: src/StreamWrapper.php
+			path: src/Stream_Wrapper.php
 
 		-
-			message: '#^Method GuzzleHttp\\Psr7\\StreamWrapper\:\:stream_stat\(\) should return array\{dev\: int, ino\: int, mode\: int, nlink\: int, uid\: int, gid\: int, rdev\: int, size\: int, \.\.\.\}\|false but returns array\{dev\: 0, ino\: 0, mode\: mixed, nlink\: 0, uid\: 0, gid\: 0, rdev\: 0, size\: int, \.\.\.\}\.$#'
+			message: '#^Method GuzzleHttp\\Psr7\\Stream_Wrapper\:\:stream_stat\(\) should return array\{dev\: int, ino\: int, mode\: int, nlink\: int, uid\: int, gid\: int, rdev\: int, size\: int, \.\.\.\}\|false but returns array\{dev\: 0, ino\: 0, mode\: mixed, nlink\: 0, uid\: 0, gid\: 0, rdev\: 0, size\: int, \.\.\.\}\.$#'
 			identifier: return.type
 			count: 1
-			path: src/StreamWrapper.php
+			path: src/Stream_Wrapper.php
 
 		-
-			message: '#^Property GuzzleHttp\\Psr7\\StreamWrapper\:\:\$stream \(Psr\\Http\\Message\\StreamInterface\) does not accept mixed\.$#'
+			message: '#^Property GuzzleHttp\\Psr7\\Stream_Wrapper\:\:\$stream \(Psr\\Http\\Message\\StreamInterface\) does not accept mixed\.$#'
 			identifier: assign.propertyType
 			count: 1
-			path: src/StreamWrapper.php
+			path: src/Stream_Wrapper.php
 
 		-
 			message: '#^Method GuzzleHttp\\Psr7\\UploadedFile\:\:isStringNotEmpty\(\) has parameter \$param with no type specified\.$#'
@@ -568,31 +568,31 @@ parameters:
 			message: '#^Parameter \#1 \$path of method Psr\\Http\\Message\\UriInterface\:\:withPath\(\) expects string, string\|null given\.$#'
 			identifier: argument.type
 			count: 3
-			path: src/UriNormalizer.php
+			path: src/Uri_Normalizer.php
 
 		-
 			message: '#^Parameter \#1 \$query of method Psr\\Http\\Message\\UriInterface\:\:withQuery\(\) expects string, string\|null given\.$#'
 			identifier: argument.type
 			count: 2
-			path: src/UriNormalizer.php
+			path: src/Uri_Normalizer.php
 
 		-
 			message: '#^Parameter \#1 \$string of function rawurldecode expects string, mixed given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/UriNormalizer.php
+			path: src/Uri_Normalizer.php
 
 		-
 			message: '#^Parameter \#1 \$string of function strtoupper expects string, mixed given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/UriNormalizer.php
+			path: src/Uri_Normalizer.php
 
 		-
 			message: '#^Strict comparison using \=\=\= between '''' and non\-falsy\-string will always evaluate to false\.$#'
 			identifier: identical.alwaysFalse
 			count: 1
-			path: src/UriResolver.php
+			path: src/Uri_Resolver.php
 
 		-
 			message: '#^Binary operation "\+" between mixed and array results in an error\.$#'
@@ -673,7 +673,7 @@ parameters:
 			path: src/Utils.php
 
 		-
-			message: '#^Parameter \#1 \$source of class GuzzleHttp\\Psr7\\PumpStream constructor expects callable\(int\)\: \(string\|false\|null\), Closure\(\)\: mixed given\.$#'
+			message: '#^Parameter \#1 \$source of class GuzzleHttp\\Psr7\\Pump_Stream constructor expects callable\(int\)\: \(string\|false\|null\), Closure\(\)\: mixed given\.$#'
 			identifier: argument.type
 			count: 1
 			path: src/Utils.php

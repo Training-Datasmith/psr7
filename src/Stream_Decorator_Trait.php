@@ -1,9 +1,11 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace Guzzle_Http\Psr7;
 
-use Psr\Http\Message\Stream_Interface;
+use Psr\Http\Message\StreamInterface;
+
 /**
  * Stream decorator trait
  *
@@ -14,13 +16,14 @@ trait Stream_Decorator_Trait
     /**
      * @param StreamInterface $stream Stream to decorate
      */
-    public function __construct(Stream_Interface $stream)
+    public function __construct(StreamInterface $stream)
     {
         $this->stream = $stream;
     }
+
     /**
      * Magic method used to create a new stream if streams are not added in
-     * the constructor of a decorator (e.g., LazyOpenStream).
+     * the constructor of a decorator (e.g., Lazy_Open_Stream).
      *
      * @return StreamInterface
      */
@@ -28,29 +31,36 @@ trait Stream_Decorator_Trait
     {
         if ($name === 'stream') {
             $this->stream = $this->create_stream();
+
             return $this->stream;
         }
-        throw new \UnexpectedValueException("{$name} not found on class");
+
+        throw new \UnexpectedValueException("$name not found on class");
     }
+
     public function __toString(): string
     {
         try {
-            if ($this->is_seekable()) {
+            if ($this->isSeekable()) {
                 $this->seek(0);
             }
-            return $this->get_contents();
+
+            return $this->getContents();
         } catch (\Throwable $e) {
             if (\PHP_VERSION_ID >= 70400) {
                 throw $e;
             }
             trigger_error(sprintf('%s::__toString exception: %s', self::class, (string) $e), E_USER_ERROR);
+
             return '';
         }
     }
-    public function get_contents(): string
+
+    public function getContents(): string
     {
         return Utils::copy_to_string($this);
     }
+
     /**
      * Allow decorators to implement custom methods
      *
@@ -60,71 +70,86 @@ trait Stream_Decorator_Trait
     {
         /** @var callable $callable */
         $callable = [$this->stream, $method];
-        $result = $callable(...$args);
+        $result = ($callable)(...$args);
+
         // Always return the wrapped object if the result is a return $this
         return $result === $this->stream ? $this : $result;
     }
+
     public function close(): void
     {
         $this->stream->close();
     }
+
     /**
      * @return mixed
      */
-    public function get_metadata($key = null)
+    public function getMetadata($key = null)
     {
-        return $this->stream->get_metadata($key);
+        return $this->stream->getMetadata($key);
     }
+
     public function detach()
     {
         return $this->stream->detach();
     }
-    public function get_size(): ?int
+
+    public function getSize(): ?int
     {
-        return $this->stream->get_size();
+        return $this->stream->getSize();
     }
+
     public function eof(): bool
     {
         return $this->stream->eof();
     }
+
     public function tell(): int
     {
         return $this->stream->tell();
     }
-    public function is_readable(): bool
+
+    public function isReadable(): bool
     {
-        return $this->stream->is_readable();
+        return $this->stream->isReadable();
     }
-    public function is_writable(): bool
+
+    public function isWritable(): bool
     {
-        return $this->stream->is_writable();
+        return $this->stream->isWritable();
     }
-    public function is_seekable(): bool
+
+    public function isSeekable(): bool
     {
-        return $this->stream->is_seekable();
+        return $this->stream->isSeekable();
     }
+
     public function rewind(): void
     {
         $this->seek(0);
     }
+
     public function seek($offset, $whence = SEEK_SET): void
     {
         $this->stream->seek($offset, $whence);
     }
+
     public function read($length): string
     {
         return $this->stream->read($length);
     }
+
     public function write($string): int
     {
         return $this->stream->write($string);
     }
+
     /**
      * Implement in subclasses to dynamically create streams when requested.
      *
      * @throws \BadMethodCallException
      */
-    protected function create_stream(): Stream_Interface
+    protected function create_stream(): StreamInterface
     {
         throw new \BadMethodCallException('Not implemented');
     }

@@ -1,31 +1,38 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace Guzzle_Http\Psr7;
 
-use Psr\Http\Message\Stream_Interface;
+use Psr\Http\Message\StreamInterface;
+
 /**
  * Provides a read only stream that pumps data from a PHP callable.
  *
- * When invoking the provided callable, the PumpStream will pass the amount of
+ * When invoking the provided callable, the Pump_Stream will pass the amount of
  * data requested to read to the callable. The callable can choose to ignore
  * this value and return fewer or more bytes than requested. Any extra data
  * returned by the provided callable is buffered internally until drained using
- * the read() function of the PumpStream. The provided callable MUST return
+ * the read() function of the Pump_Stream. The provided callable MUST return
  * false when there is no more data to read.
  */
-final class Pump_Stream implements Stream_Interface
+final class Pump_Stream implements StreamInterface
 {
     /** @var callable(int): (string|false|null)|null */
     private $source;
+
     /** @var int|null */
     private $size;
+
     /** @var int */
     private $tell_pos = 0;
+
     /** @var array */
     private $metadata;
-    /** @var BufferStream */
+
+    /** @var Buffer_Stream */
     private $buffer;
+
     /**
      * @param callable(int): (string|false|null)  $source  Source of the stream data. The callable MAY
      *                                                     accept an integer argument used to control the
@@ -43,6 +50,7 @@ final class Pump_Stream implements Stream_Interface
         $this->metadata = $options['metadata'] ?? [];
         $this->buffer = new Buffer_Stream();
     }
+
     public function __toString(): string
     {
         try {
@@ -52,86 +60,107 @@ final class Pump_Stream implements Stream_Interface
                 throw $e;
             }
             trigger_error(sprintf('%s::__toString exception: %s', self::class, (string) $e), E_USER_ERROR);
+
             return '';
         }
     }
+
     public function close(): void
     {
         $this->detach();
     }
+
     public function detach()
     {
         $this->tell_pos = 0;
         $this->source = null;
+
         return null;
     }
-    public function get_size(): ?int
+
+    public function getSize(): ?int
     {
         return $this->size;
     }
+
     public function tell(): int
     {
         return $this->tell_pos;
     }
+
     public function eof(): bool
     {
         return $this->source === null;
     }
-    public function is_seekable(): bool
+
+    public function isSeekable(): bool
     {
         return false;
     }
+
     public function rewind(): void
     {
         $this->seek(0);
     }
+
     public function seek($offset, $whence = SEEK_SET): void
     {
-        throw new \RuntimeException('Cannot seek a PumpStream');
+        throw new \RuntimeException('Cannot seek a Pump_Stream');
     }
-    public function is_writable(): bool
+
+    public function isWritable(): bool
     {
         return false;
     }
+
     public function write($string): int
     {
-        throw new \RuntimeException('Cannot write to a PumpStream');
+        throw new \RuntimeException('Cannot write to a Pump_Stream');
     }
-    public function is_readable(): bool
+
+    public function isReadable(): bool
     {
         return true;
     }
+
     public function read($length): string
     {
         $data = $this->buffer->read($length);
-        $read_len = strlen($data);
-        $this->tell_pos += $read_len;
-        $remaining = $length - $read_len;
+        $readLen = strlen($data);
+        $this->tell_pos += $readLen;
+        $remaining = $length - $readLen;
+
         if ($remaining) {
             $this->pump($remaining);
             $data .= $this->buffer->read($remaining);
-            $this->tell_pos += strlen($data) - $read_len;
+            $this->tell_pos += strlen($data) - $readLen;
         }
+
         return $data;
     }
-    public function get_contents(): string
+
+    public function getContents(): string
     {
         $result = '';
         while (!$this->eof()) {
             $result .= $this->read(1000000);
         }
+
         return $result;
     }
+
     /**
      * @return mixed
      */
-    public function get_metadata($key = null)
+    public function getMetadata($key = null)
     {
         if (!$key) {
             return $this->metadata;
         }
+
         return $this->metadata[$key] ?? null;
     }
+
     private function pump(int $length): void
     {
         if ($this->source !== null) {
@@ -139,6 +168,7 @@ final class Pump_Stream implements Stream_Interface
                 $data = ($this->source)($length);
                 if ($data === false || $data === null) {
                     $this->source = null;
+
                     return;
                 }
                 $this->buffer->write($data);

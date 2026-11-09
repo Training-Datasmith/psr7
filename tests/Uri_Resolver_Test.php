@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\Psr7\UriResolver;
+use Guzzle_Http\Psr7\Uri;
+use Guzzle_Http\Psr7\Uri_Resolver;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriInterface;
 
 /**
- * @covers \GuzzleHttp\Psr7\UriResolver
+ * @covers \Guzzle_Http\Psr7\Uri_Resolver
  */
-class UriResolverTest extends TestCase
+class Uri_ResolverTest extends TestCase
 {
     private const RFC3986_BASE = 'http://a/b/c/d;p?q';
 
@@ -22,14 +22,14 @@ class UriResolverTest extends TestCase
     public function testResolveUri(string $base, string $rel, string $expectedTarget): void
     {
         $baseUri = new Uri($base);
-        $targetUri = UriResolver::resolve($baseUri, new Uri($rel));
+        $targetUri = Uri_Resolver::resolve($baseUri, new Uri($rel));
 
         self::assertInstanceOf(UriInterface::class, $targetUri);
         self::assertSame($expectedTarget, (string) $targetUri);
         // This ensures there are no test cases that only work in the resolve() direction but not the
         // opposite via relativize(). This can happen when both base and rel URI are relative-path
         // references resulting in another relative-path URI.
-        self::assertSame($expectedTarget, (string) UriResolver::resolve($baseUri, $targetUri));
+        self::assertSame($expectedTarget, (string) Uri_Resolver::resolve($baseUri, $targetUri));
     }
 
     /**
@@ -38,14 +38,14 @@ class UriResolverTest extends TestCase
     public function testRelativizeUri(string $base, string $expectedRelativeReference, string $target): void
     {
         $baseUri = new Uri($base);
-        $relativeUri = UriResolver::relativize($baseUri, new Uri($target));
+        $relativeUri = Uri_Resolver::relativize($baseUri, new Uri($target));
 
         self::assertInstanceOf(UriInterface::class, $relativeUri);
         // There are test-cases with too many dot-segments and relative references that are equal like "." == "./".
         // So apart from the same-as condition, this alternative success condition is necessary.
         self::assertTrue(
             $expectedRelativeReference === (string) $relativeUri
-            || $target === (string) UriResolver::resolve($baseUri, $relativeUri),
+            || $target === (string) Uri_Resolver::resolve($baseUri, $relativeUri),
             sprintf(
                 '"%s" is not the correct relative reference as it does not resolve to the target URI from the base URI',
                 (string) $relativeUri
@@ -60,12 +60,12 @@ class UriResolverTest extends TestCase
     {
         $baseUri = new Uri($base);
         $targetUri = new Uri($target);
-        $relativeUri = UriResolver::relativize($baseUri, $targetUri);
+        $relativeUri = Uri_Resolver::relativize($baseUri, $targetUri);
 
         self::assertInstanceOf(UriInterface::class, $relativeUri);
         self::assertSame($expectedRelativeReference, (string) $relativeUri);
 
-        self::assertSame((string) UriResolver::resolve($baseUri, $targetUri), (string) UriResolver::resolve($baseUri, $relativeUri));
+        self::assertSame((string) Uri_Resolver::resolve($baseUri, $targetUri), (string) Uri_Resolver::resolve($baseUri, $relativeUri));
     }
 
     public static function getResolveTestCases(): iterable

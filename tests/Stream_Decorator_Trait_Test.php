@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7;
-use GuzzleHttp\Psr7\StreamDecoratorTrait;
+use Guzzle_Http\Psr7;
+use Guzzle_Http\Psr7\Stream_Decorator_Trait;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 
 class Str implements StreamInterface
 {
-    use StreamDecoratorTrait;
+    use Stream_Decorator_Trait;
 
     /** @var StreamInterface */
     private $stream;
 }
 
 /**
- * @covers \GuzzleHttp\Psr7\StreamDecoratorTrait
+ * @covers \Guzzle_Http\Psr7\Stream_Decorator_Trait
  */
-class StreamDecoratorTraitTest extends TestCase
+class Stream_Decorator_TraitTest extends TestCase
 {
     /** @var StreamInterface */
     private $a;
@@ -34,7 +34,7 @@ class StreamDecoratorTraitTest extends TestCase
         $this->c = fopen('php://temp', 'r+');
         fwrite($this->c, 'foo');
         fseek($this->c, 0);
-        $this->a = Psr7\Utils::streamFor($this->c);
+        $this->a = Psr7\Utils::stream_for($this->c);
         $this->b = new Str($this->a);
     }
 
@@ -140,7 +140,7 @@ class StreamDecoratorTraitTest extends TestCase
 
 class BadStream
 {
-    use StreamDecoratorTrait;
+    use Stream_Decorator_Trait;
 
     public function __construct()
     {

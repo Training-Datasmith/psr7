@@ -10,16 +10,16 @@ A PHP implementation of PSR-7 (HTTP Message Interface) and PSR-17 (HTTP Factory 
 src/
   Request.php                 - PSR-7 RequestInterface implementation
   Response.php                - PSR-7 ResponseInterface implementation
-  Server_Request.php          - PSR-7 ServerRequestInterface implementation
+  Server_Request.php          - PSR-7 Server_RequestInterface implementation
   Uri.php                     - PSR-7 UriInterface implementation
   Stream.php                  - PSR-7 StreamInterface wrapping PHP streams
   Uploaded_File.php           - PSR-7 UploadedFileInterface implementation
   Http_Factory.php            - PSR-17 factory for creating all PSR-7 objects
   Message_Trait.php           - Shared logic for Request/Response (headers, body)
-  Utils.php                   - Static helpers: streamFor(), copyToStream(), etc.
+  Utils.php                   - Static helpers: stream_for(), copy_to_stream(), etc.
   Header.php                  - Header value parsing utilities
   Query.php                   - URL query string encoding/decoding utilities
-  Uri_Normaliser.php          - RFC 3986 URI normalisation
+  Uri_Normalizer.php          - RFC 3986 URI normalisation
   Uri_Comparator.php          - URI equality comparison (origin/path matching)
   Uri_Resolver.php            - Resolves relative URIs against a base URI
   Mime_Type.php               - MIME type detection by file extension
@@ -54,7 +54,7 @@ src/
 
 ```
 Http_Factory (PSR-17)
-  └─> creates Request, Response, ServerRequest, Uri, Stream, UploadedFile
+  └─> creates Request, Response, Server_Request, Uri, Stream, UploadedFile
 Request / Response
   └─> Message_Trait — shared header/body handling
   └─> Uri           — parsed URI

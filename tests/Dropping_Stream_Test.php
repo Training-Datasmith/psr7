@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7\BufferStream;
-use GuzzleHttp\Psr7\DroppingStream;
+use Guzzle_Http\Psr7\Buffer_Stream;
+use Guzzle_Http\Psr7\Dropping_Stream;
 use PHPUnit\Framework\TestCase;
 
-class DroppingStreamTest extends TestCase
+class Dropping_Stream_Test extends TestCase
 {
     public function testBeginsDroppingWhenSizeExceeded(): void
     {
-        $stream = new BufferStream();
-        $drop = new DroppingStream($stream, 5);
+        $stream = new Buffer_Stream();
+        $drop = new Dropping_Stream($stream, 5);
         self::assertSame(3, $drop->write('hel'));
         self::assertSame(2, $drop->write('lo'));
         self::assertSame(5, $drop->getSize());

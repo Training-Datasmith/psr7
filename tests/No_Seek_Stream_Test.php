@@ -2,35 +2,35 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7\NoSeekStream;
+use Guzzle_Http\Psr7\No_Seek_Stream;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 
 /**
- * @covers \GuzzleHttp\Psr7\NoSeekStream
- * @covers \GuzzleHttp\Psr7\StreamDecoratorTrait
+ * @covers \Guzzle_Http\Psr7\No_Seek_Stream
+ * @covers \Guzzle_Http\Psr7\Stream_Decorator_Trait
  */
-class NoSeekStreamTest extends TestCase
+class No_Seek_Stream_Test extends TestCase
 {
     public function testCannotSeek(): void
     {
         $s = $this->createMock(StreamInterface::class);
         $s->expects(self::never())->method('seek');
         $s->expects(self::never())->method('isSeekable');
-        $wrapped = new NoSeekStream($s);
+        $wrapped = new No_Seek_Stream($s);
         self::assertFalse($wrapped->isSeekable());
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Cannot seek a NoSeekStream');
+        $this->expectExceptionMessage('Cannot seek a No_Seek_Stream');
         $wrapped->seek(2);
     }
 
     public function testToStringDoesNotSeek(): void
     {
-        $s = \GuzzleHttp\Psr7\Utils::streamFor('foo');
+        $s = \Guzzle_Http\Psr7\Utils::stream_for('foo');
         $s->seek(1);
-        $wrapped = new NoSeekStream($s);
+        $wrapped = new No_Seek_Stream($s);
         self::assertSame('oo', (string) $wrapped);
 
         $wrapped->close();

@@ -1,9 +1,11 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace Guzzle_Http\Psr7;
 
-use Psr\Http\Message\Stream_Interface;
+use Psr\Http\Message\StreamInterface;
+
 /**
  * Uses PHP's zlib.inflate filter to inflate zlib (HTTP deflate, RFC1950) or gzipped (RFC1952) content.
  *
@@ -15,12 +17,14 @@ use Psr\Http\Message\Stream_Interface;
  * @see https://datatracker.ietf.org/doc/html/rfc1952
  * @see https://www.php.net/manual/en/filters.compression.php
  */
-final class Inflate_Stream implements Stream_Interface
+final class Inflate_Stream implements StreamInterface
 {
     use Stream_Decorator_Trait;
+
     /** @var StreamInterface */
     private $stream;
-    public function __construct(Stream_Interface $stream)
+
+    public function __construct(StreamInterface $stream)
     {
         $resource = Stream_Wrapper::get_resource($stream);
         // Specify window=15+32, so zlib will use header detection to both gzip (with header) and zlib data
@@ -28,6 +32,6 @@ final class Inflate_Stream implements Stream_Interface
         // "Add 32 to windowBits to enable zlib and gzip decoding with automatic header detection"
         // Default window size is 15.
         stream_filter_append($resource, 'zlib.inflate', STREAM_FILTER_READ, ['window' => 15 + 32]);
-        $this->stream = $stream->is_seekable() ? new Stream($resource) : new No_Seek_Stream(new Stream($resource));
+        $this->stream = $stream->isSeekable() ? new Stream($resource) : new No_Seek_Stream(new Stream($resource));
     }
 }

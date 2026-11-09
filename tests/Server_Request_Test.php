@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7\ServerRequest;
-use GuzzleHttp\Psr7\UploadedFile;
-use GuzzleHttp\Psr7\Uri;
+use Guzzle_Http\Psr7\Server_Request;
+use Guzzle_Http\Psr7\Uploaded_File;
+use Guzzle_Http\Psr7\Uri;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \GuzzleHttp\Psr7\ServerRequest
+ * @covers \Guzzle_Http\Psr7\Server_Request
  */
-class ServerRequestTest extends TestCase
+class Server_RequestTest extends TestCase
 {
     public static function dataNormalizeFiles(): iterable
     {
@@ -28,7 +28,7 @@ class ServerRequestTest extends TestCase
                     ],
                 ],
                 [
-                    'file' => new UploadedFile(
+                    'file' => new Uploaded_File(
                         '/tmp/php/php1h4j1o',
                         123,
                         UPLOAD_ERR_OK,
@@ -48,7 +48,7 @@ class ServerRequestTest extends TestCase
                     ],
                 ],
                 [
-                    'image_file' => new UploadedFile(
+                    'image_file' => new Uploaded_File(
                         '',
                         0,
                         UPLOAD_ERR_NO_FILE,
@@ -59,7 +59,7 @@ class ServerRequestTest extends TestCase
             ],
             'Already Converted' => [
                 [
-                    'file' => new UploadedFile(
+                    'file' => new Uploaded_File(
                         '/tmp/php/php1h4j1o',
                         123,
                         UPLOAD_ERR_OK,
@@ -68,7 +68,7 @@ class ServerRequestTest extends TestCase
                     ),
                 ],
                 [
-                    'file' => new UploadedFile(
+                    'file' => new Uploaded_File(
                         '/tmp/php/php1h4j1o',
                         123,
                         UPLOAD_ERR_OK,
@@ -80,14 +80,14 @@ class ServerRequestTest extends TestCase
             'Already Converted array' => [
                 [
                     'file' => [
-                        new UploadedFile(
+                        new Uploaded_File(
                             '/tmp/php/php1h4j1o',
                             123,
                             UPLOAD_ERR_OK,
                             'MyFile.txt',
                             'text/plain'
                         ),
-                        new UploadedFile(
+                        new Uploaded_File(
                             '',
                             0,
                             UPLOAD_ERR_NO_FILE,
@@ -98,14 +98,14 @@ class ServerRequestTest extends TestCase
                 ],
                 [
                     'file' => [
-                        new UploadedFile(
+                        new Uploaded_File(
                             '/tmp/php/php1h4j1o',
                             123,
                             UPLOAD_ERR_OK,
                             'MyFile.txt',
                             'text/plain'
                         ),
-                        new UploadedFile(
+                        new Uploaded_File(
                             '',
                             0,
                             UPLOAD_ERR_NO_FILE,
@@ -133,14 +133,14 @@ class ServerRequestTest extends TestCase
                     ],
                 ],
                 [
-                    'text_file' => new UploadedFile(
+                    'text_file' => new Uploaded_File(
                         '/tmp/php/php1h4j1o',
                         123,
                         UPLOAD_ERR_OK,
                         'MyFile.txt',
                         'text/plain'
                     ),
-                    'image_file' => new UploadedFile(
+                    'image_file' => new Uploaded_File(
                         '',
                         0,
                         UPLOAD_ERR_NO_FILE,
@@ -219,35 +219,35 @@ class ServerRequestTest extends TestCase
                 ],
                 [
                     'file' => [
-                        0 => new UploadedFile(
+                        0 => new Uploaded_File(
                             '/tmp/php/hp9hskjhf',
                             123,
                             UPLOAD_ERR_OK,
                             'MyFile.txt',
                             'text/plain'
                         ),
-                        1 => new UploadedFile(
+                        1 => new Uploaded_File(
                             '/tmp/php/php1h4j1o',
                             7349,
                             UPLOAD_ERR_OK,
                             'Image.png',
                             'image/png'
                         ),
-                        2 => new UploadedFile(
+                        2 => new Uploaded_File(
                             '/tmp/php/w0ensl4ar',
                             null,
                             UPLOAD_ERR_OK
                         ),
                     ],
                     'minimum_data' => [
-                        0 => new UploadedFile(
+                        0 => new Uploaded_File(
                             '/tmp/php/hp9hskjhf',
                             0,
                             UPLOAD_ERR_OK
                         ),
                     ],
                     'nested' => [
-                        'other' => new UploadedFile(
+                        'other' => new Uploaded_File(
                             '/tmp/php/hp9hskjhf',
                             421,
                             UPLOAD_ERR_OK,
@@ -255,14 +255,14 @@ class ServerRequestTest extends TestCase
                             'text/plain'
                         ),
                         'test' => [
-                            0 => new UploadedFile(
+                            0 => new Uploaded_File(
                                 '/tmp/php/asifu2gp3',
                                 32,
                                 UPLOAD_ERR_OK,
                                 'Stuff.txt',
                                 'text/plain'
                             ),
-                            1 => new UploadedFile(
+                            1 => new Uploaded_File(
                                 '',
                                 0,
                                 UPLOAD_ERR_NO_FILE,
@@ -281,7 +281,7 @@ class ServerRequestTest extends TestCase
      */
     public function testNormalizeFiles($files, $expected): void
     {
-        $result = ServerRequest::normalizeFiles($files);
+        $result = Server_Request::normalize_files($files);
 
         self::assertEquals($expected, $result);
     }
@@ -290,7 +290,7 @@ class ServerRequestTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid value in files specification');
-        ServerRequest::normalizeFiles(['test' => 'something']);
+        Server_Request::normalize_files(['test' => 'something']);
     }
 
     public static function dataGetUriFromGlobals(): iterable
@@ -372,11 +372,11 @@ class ServerRequestTest extends TestCase
     /**
      * @dataProvider dataGetUriFromGlobals
      */
-    public function testGetUriFromGlobals($expected, $serverParams): void
+    public function testGetUriFromGlobals($expected, $server_params): void
     {
-        $_SERVER = $serverParams;
+        $_SERVER = $server_params;
 
-        self::assertEquals(new Uri($expected), ServerRequest::getUriFromGlobals());
+        self::assertEquals(new Uri($expected), Server_Request::get_uri_from_globals());
     }
 
     public function testFromGlobals(): void
@@ -427,7 +427,7 @@ class ServerRequestTest extends TestCase
             ],
         ];
 
-        $server = ServerRequest::fromGlobals();
+        $server = Server_Request::from_globals();
 
         self::assertSame('POST', $server->getMethod());
         self::assertEquals([
@@ -449,7 +449,7 @@ class ServerRequestTest extends TestCase
         );
 
         $expectedFiles = [
-            'file' => new UploadedFile(
+            'file' => new Uploaded_File(
                 '/tmp/php/php1h4j1o',
                 123,
                 UPLOAD_ERR_OK,
@@ -461,12 +461,12 @@ class ServerRequestTest extends TestCase
         self::assertEquals($expectedFiles, $server->getUploadedFiles());
     }
 
-    public function testUploadedFiles(): void
+    public function testUploaded_Files(): void
     {
-        $request1 = new ServerRequest('GET', '/');
+        $request1 = new Server_Request('GET', '/');
 
         $files = [
-            'file' => new UploadedFile('test', 123, UPLOAD_ERR_OK),
+            'file' => new Uploaded_File('test', 123, UPLOAD_ERR_OK),
         ];
 
         $request2 = $request1->withUploadedFiles($files);
@@ -480,13 +480,13 @@ class ServerRequestTest extends TestCase
     {
         $params = ['name' => 'value'];
 
-        $request = new ServerRequest('GET', '/', [], null, '1.1', $params);
+        $request = new Server_Request('GET', '/', [], null, '1.1', $params);
         self::assertSame($params, $request->getServerParams());
     }
 
     public function testCookieParams(): void
     {
-        $request1 = new ServerRequest('GET', '/');
+        $request1 = new Server_Request('GET', '/');
 
         $params = ['name' => 'value'];
 
@@ -499,7 +499,7 @@ class ServerRequestTest extends TestCase
 
     public function testQueryParams(): void
     {
-        $request1 = new ServerRequest('GET', '/');
+        $request1 = new Server_Request('GET', '/');
 
         $params = ['name' => 'value'];
 
@@ -512,7 +512,7 @@ class ServerRequestTest extends TestCase
 
     public function testParsedBody(): void
     {
-        $request1 = new ServerRequest('GET', '/');
+        $request1 = new Server_Request('GET', '/');
 
         $params = ['name' => 'value'];
 
@@ -525,7 +525,7 @@ class ServerRequestTest extends TestCase
 
     public function testAttributes(): void
     {
-        $request1 = new ServerRequest('GET', '/');
+        $request1 = new Server_Request('GET', '/');
 
         $request2 = $request1->withAttribute('name', 'value');
         $request3 = $request2->withAttribute('other', 'otherValue');
@@ -553,7 +553,7 @@ class ServerRequestTest extends TestCase
 
     public function testNullAttribute(): void
     {
-        $request = (new ServerRequest('GET', '/'))->withAttribute('name', null);
+        $request = (new Server_Request('GET', '/'))->withAttribute('name', null);
 
         self::assertSame(['name' => null], $request->getAttributes());
         self::assertNull($request->getAttribute('name', 'different-default'));

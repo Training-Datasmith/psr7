@@ -1,9 +1,11 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace Guzzle_Http\Psr7;
 
-use Psr\Http\Message\Uri_Interface;
+use Psr\Http\Message\UriInterface;
+
 /**
  * Provides methods to normalize and compare URIs.
  *
@@ -16,13 +18,21 @@ final class Uri_Normalizer
     /**
      * Default normalizations which only include the ones that preserve semantics.
      */
-    public const PRESERVING_NORMALIZATIONS = self::CAPITALIZE_PERCENT_ENCODING | self::DECODE_UNRESERVED_CHARACTERS | self::CONVERT_EMPTY_PATH | self::REMOVE_DEFAULT_HOST | self::REMOVE_DEFAULT_PORT | self::REMOVE_DOT_SEGMENTS;
+    public const PRESERVING_NORMALIZATIONS =
+        self::CAPITALIZE_PERCENT_ENCODING |
+        self::DECODE_UNRESERVED_CHARACTERS |
+        self::CONVERT_EMPTY_PATH |
+        self::REMOVE_DEFAULT_HOST |
+        self::REMOVE_DEFAULT_PORT |
+        self::REMOVE_DOT_SEGMENTS;
+
     /**
      * All letters within a percent-encoding triplet (e.g., "%3A") are case-insensitive, and should be capitalized.
      *
      * Example: http://example.org/a%c2%b1b → http://example.org/a%C2%B1b
      */
     public const CAPITALIZE_PERCENT_ENCODING = 1;
+
     /**
      * Decodes percent-encoded octets of unreserved characters.
      *
@@ -33,12 +43,14 @@ final class Uri_Normalizer
      * Example: http://example.org/%7Eusern%61me/ → http://example.org/~username/
      */
     public const DECODE_UNRESERVED_CHARACTERS = 2;
+
     /**
      * Converts the empty path to "/" for http and https URIs.
      *
      * Example: http://example.org → http://example.org/
      */
     public const CONVERT_EMPTY_PATH = 4;
+
     /**
      * Removes the default host of the given URI scheme from the URI.
      *
@@ -46,17 +58,19 @@ final class Uri_Normalizer
      * All of `file:/myfile`, `file:///myfile`, and `file://localhost/myfile`
      * are equivalent according to RFC 3986. The first format is not accepted
      * by PHPs stream functions and thus already normalized implicitly to the
-     * second format in the Uri class. See `GuzzleHttp\Psr7\Uri::composeComponents`.
+     * second format in the Uri class. See `Guzzle_Http\Psr7\Uri::composeComponents`.
      *
      * Example: file://localhost/myfile → file:///myfile
      */
     public const REMOVE_DEFAULT_HOST = 8;
+
     /**
      * Removes the default port of the given URI scheme from the URI.
      *
      * Example: http://example.org:80/ → http://example.org/
      */
     public const REMOVE_DEFAULT_PORT = 16;
+
     /**
      * Removes unnecessary dot-segments.
      *
@@ -66,6 +80,7 @@ final class Uri_Normalizer
      * Example: http://example.org/../a/b/../c/./d.html → http://example.org/a/c/d.html
      */
     public const REMOVE_DOT_SEGMENTS = 32;
+
     /**
      * Paths which include two or more adjacent slashes are converted to one.
      *
@@ -76,6 +91,7 @@ final class Uri_Normalizer
      * Example: http://example.org//foo///bar.html → http://example.org/foo/bar.html
      */
     public const REMOVE_DUPLICATE_SLASHES = 64;
+
     /**
      * Sort query parameters with their values in alphabetical order.
      *
@@ -88,6 +104,7 @@ final class Uri_Normalizer
      * purpose is to be able to compare URIs in a reproducible way, not to have the params sorted perfectly.
      */
     public const SORT_QUERY_PARAMETERS = 128;
+
     /**
      * Returns a normalized URI.
      *
@@ -104,36 +121,47 @@ final class Uri_Normalizer
      *
      * @see https://datatracker.ietf.org/doc/html/rfc3986#section-6.2
      */
-    public static function normalize(Uri_Interface $uri, int $flags = self::PRESERVING_NORMALIZATIONS): Uri_Interface
+    public static function normalize(UriInterface $uri, int $flags = self::PRESERVING_NORMALIZATIONS): UriInterface
     {
         if ($flags & self::CAPITALIZE_PERCENT_ENCODING) {
             $uri = self::capitalize_percent_encoding($uri);
         }
+
         if ($flags & self::DECODE_UNRESERVED_CHARACTERS) {
             $uri = self::decode_unreserved_characters($uri);
         }
-        if ($flags & self::CONVERT_EMPTY_PATH && $uri->get_path() === '' && ($uri->get_scheme() === 'http' || $uri->get_scheme() === 'https')) {
-            $uri = $uri->with_path('/');
+
+        if ($flags & self::CONVERT_EMPTY_PATH && $uri->getPath() === ''
+            && ($uri->getScheme() === 'http' || $uri->getScheme() === 'https')
+        ) {
+            $uri = $uri->withPath('/');
         }
-        if ($flags & self::REMOVE_DEFAULT_HOST && $uri->get_scheme() === 'file' && $uri->get_host() === 'localhost') {
-            $uri = $uri->with_host('');
+
+        if ($flags & self::REMOVE_DEFAULT_HOST && $uri->getScheme() === 'file' && $uri->getHost() === 'localhost') {
+            $uri = $uri->withHost('');
         }
-        if ($flags & self::REMOVE_DEFAULT_PORT && $uri->get_port() !== null && Uri::is_default_port($uri)) {
-            $uri = $uri->with_port(null);
+
+        if ($flags & self::REMOVE_DEFAULT_PORT && $uri->getPort() !== null && Uri::is_default_port($uri)) {
+            $uri = $uri->withPort(null);
         }
+
         if ($flags & self::REMOVE_DOT_SEGMENTS && !Uri::is_relative_path_reference($uri)) {
-            $uri = $uri->with_path(Uri_Resolver::remove_dot_segments($uri->get_path()));
+            $uri = $uri->withPath(Uri_Resolver::remove_dot_segments($uri->getPath()));
         }
+
         if ($flags & self::REMOVE_DUPLICATE_SLASHES) {
-            $uri = $uri->with_path(preg_replace('#//++#', '/', $uri->get_path()));
+            $uri = $uri->withPath(preg_replace('#//++#', '/', $uri->getPath()));
         }
-        if ($flags & self::SORT_QUERY_PARAMETERS && $uri->get_query() !== '') {
-            $query_key_values = explode('&', $uri->get_query());
-            sort($query_key_values);
-            $uri = $uri->with_query(implode('&', $query_key_values));
+
+        if ($flags & self::SORT_QUERY_PARAMETERS && $uri->getQuery() !== '') {
+            $queryKeyValues = explode('&', $uri->getQuery());
+            sort($queryKeyValues);
+            $uri = $uri->withQuery(implode('&', $queryKeyValues));
         }
+
         return $uri;
     }
+
     /**
      * Whether two URIs can be considered equivalent.
      *
@@ -148,26 +176,43 @@ final class Uri_Normalizer
      *
      * @see https://datatracker.ietf.org/doc/html/rfc3986#section-6.1
      */
-    public static function is_equivalent(Uri_Interface $uri1, Uri_Interface $uri2, int $normalizations = self::PRESERVING_NORMALIZATIONS): bool
+    public static function is_equivalent(UriInterface $uri1, UriInterface $uri2, int $normalizations = self::PRESERVING_NORMALIZATIONS): bool
     {
         return (string) self::normalize($uri1, $normalizations) === (string) self::normalize($uri2, $normalizations);
     }
-    private static function capitalize_percent_encoding(Uri_Interface $uri): Uri_Interface
+
+    private static function capitalize_percent_encoding(UriInterface $uri): UriInterface
     {
         $regex = '/(?:%[A-Fa-f0-9]{2})++/';
+
         $callback = function (array $match): string {
             return strtoupper($match[0]);
         };
-        return $uri->with_path(preg_replace_callback($regex, $callback, $uri->get_path()))->with_query(preg_replace_callback($regex, $callback, $uri->get_query()));
+
+        return
+            $uri->withPath(
+                preg_replace_callback($regex, $callback, $uri->getPath())
+            )->withQuery(
+                preg_replace_callback($regex, $callback, $uri->getQuery())
+            );
     }
-    private static function decode_unreserved_characters(Uri_Interface $uri): Uri_Interface
+
+    private static function decode_unreserved_characters(UriInterface $uri): UriInterface
     {
         $regex = '/%(?:2D|2E|5F|7E|3[0-9]|[46][1-9A-F]|[57][0-9A])/i';
+
         $callback = function (array $match): string {
             return rawurldecode($match[0]);
         };
-        return $uri->with_path(preg_replace_callback($regex, $callback, $uri->get_path()))->with_query(preg_replace_callback($regex, $callback, $uri->get_query()));
+
+        return
+            $uri->withPath(
+                preg_replace_callback($regex, $callback, $uri->getPath())
+            )->withQuery(
+                preg_replace_callback($regex, $callback, $uri->getQuery())
+            );
     }
+
     private function __construct()
     {
         // cannot be instantiated

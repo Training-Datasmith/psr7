@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7\Integration;
+namespace Guzzle_Http\Tests\Psr7\Integration;
 
 use PHPUnit\Framework\TestCase;
 
-class ServerRequestFromGlobalsTest extends TestCase
+class Server_RequestFromGlobalsTest extends TestCase
 {
     protected function setUp(): void
     {

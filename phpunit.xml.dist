@@ -25,11 +25,11 @@
         </whitelist>
     </filter>
     <php>
-        <const name="REQUEST_FACTORY" value="GuzzleHttp\Psr7\HttpFactory"/>
-        <const name="RESPONSE_FACTORY" value="GuzzleHttp\Psr7\HttpFactory"/>
-        <const name="SERVER_REQUEST_FACTORY" value="GuzzleHttp\Psr7\HttpFactory"/>
-        <const name="STREAM_FACTORY" value="GuzzleHttp\Psr7\HttpFactory"/>
-        <const name="UPLOADED_FILE_FACTORY" value="GuzzleHttp\Psr7\HttpFactory"/>
-        <const name="URI_FACTORY" value="GuzzleHttp\Psr7\HttpFactory"/>
+        <const name="REQUEST_FACTORY" value="Guzzle_Http\Psr7\Http_Factory"/>
+        <const name="RESPONSE_FACTORY" value="Guzzle_Http\Psr7\Http_Factory"/>
+        <const name="SERVER_REQUEST_FACTORY" value="Guzzle_Http\Psr7\Http_Factory"/>
+        <const name="STREAM_FACTORY" value="Guzzle_Http\Psr7\Http_Factory"/>
+        <const name="UPLOADED_FILE_FACTORY" value="Guzzle_Http\Psr7\Http_Factory"/>
+        <const name="URI_FACTORY" value="Guzzle_Http\Psr7\Http_Factory"/>
     </php>
 </phpunit>

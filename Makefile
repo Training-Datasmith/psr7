@@ -1,4 +1,7 @@
 test:
+	@php scripts/check-legacy-names.php
+	@php scripts/check-cluster-pins.php
+	@php scripts/check-psr-contracts.php
 	vendor/bin/phpunit $(TEST)
 
 check-tag:

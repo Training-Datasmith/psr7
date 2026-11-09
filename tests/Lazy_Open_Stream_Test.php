@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7\LazyOpenStream;
+use Guzzle_Http\Psr7\Lazy_Open_Stream;
 use PHPUnit\Framework\TestCase;
 
-class LazyOpenStreamTest extends TestCase
+class Lazy_Open_Stream_Test extends TestCase
 {
     private $fname;
 
@@ -29,7 +29,7 @@ class LazyOpenStreamTest extends TestCase
 
     public function testOpensLazily(): void
     {
-        $l = new LazyOpenStream($this->fname, 'w+');
+        $l = new Lazy_Open_Stream($this->fname, 'w+');
         $l->write('foo');
         self::assertIsArray($l->getMetadata());
         self::assertFileExists($this->fname);
@@ -40,7 +40,7 @@ class LazyOpenStreamTest extends TestCase
     public function testProxiesToFile(): void
     {
         file_put_contents($this->fname, 'foo');
-        $l = new LazyOpenStream($this->fname, 'r');
+        $l = new Lazy_Open_Stream($this->fname, 'r');
         self::assertSame('foo', $l->read(4));
         self::assertTrue($l->eof());
         self::assertSame(3, $l->tell());
@@ -58,7 +58,7 @@ class LazyOpenStreamTest extends TestCase
     public function testDetachesUnderlyingStream(): void
     {
         file_put_contents($this->fname, 'foo');
-        $l = new LazyOpenStream($this->fname, 'r');
+        $l = new Lazy_Open_Stream($this->fname, 'r');
         $r = $l->detach();
         self::assertIsResource($r);
         fseek($r, 0);

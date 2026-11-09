@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7;
-use GuzzleHttp\Psr7\StreamWrapper;
-use GuzzleHttp\Psr7\Utils;
+use Guzzle_Http\Psr7;
+use Guzzle_Http\Psr7\Stream_Wrapper;
+use Guzzle_Http\Psr7\Utils;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 
 /**
- * @covers \GuzzleHttp\Psr7\StreamWrapper
+ * @covers \Guzzle_Http\Psr7\Stream_Wrapper
  */
-class StreamWrapperTest extends TestCase
+class Stream_WrapperTest extends TestCase
 {
     public function testResource(): void
     {
-        $stream = Utils::streamFor('foo');
-        $handle = StreamWrapper::getResource($stream);
+        $stream = Utils::stream_for('foo');
+        $handle = Stream_Wrapper::get_resource($stream);
         self::assertSame('foo', fread($handle, 3));
         self::assertSame(3, ftell($handle));
         self::assertSame(3, fwrite($handle, 'bar'));
@@ -64,16 +64,16 @@ class StreamWrapperTest extends TestCase
 
     public function testStreamContext(): void
     {
-        $stream = Utils::streamFor('foo');
+        $stream = Utils::stream_for('foo');
 
-        self::assertSame('foo', file_get_contents('guzzle://stream', false, StreamWrapper::createStreamContext($stream)));
+        self::assertSame('foo', file_get_contents('guzzle://stream', false, Stream_Wrapper::create_stream_context($stream)));
     }
 
     public function testStreamCast(): void
     {
         $streams = [
-            StreamWrapper::getResource(Utils::streamFor('foo')),
-            StreamWrapper::getResource(Utils::streamFor('bar')),
+            Stream_Wrapper::get_resource(Utils::stream_for('foo')),
+            Stream_Wrapper::get_resource(Utils::stream_for('bar')),
         ];
         $write = null;
         $except = null;
@@ -91,7 +91,7 @@ class StreamWrapperTest extends TestCase
             ->willReturn(false);
 
         $this->expectException(\InvalidArgumentException::class);
-        StreamWrapper::getResource($stream);
+        Stream_Wrapper::get_resource($stream);
     }
 
     public function testReturnsFalseWhenStreamDoesNotExist(): void
@@ -109,14 +109,14 @@ class StreamWrapperTest extends TestCase
         $stream->expects(self::once())
             ->method('isWritable')
             ->willReturn(true);
-        $r = StreamWrapper::getResource($stream);
+        $r = Stream_Wrapper::get_resource($stream);
         self::assertIsResource($r);
         fclose($r);
     }
 
     public function testUrlStat(): void
     {
-        StreamWrapper::register();
+        Stream_Wrapper::register();
 
         $stBlksize = defined('PHP_WINDOWS_VERSION_BUILD') ? -1 : 0;
 
@@ -158,10 +158,10 @@ class StreamWrapperTest extends TestCase
      */
     public function testXmlReaderWithStream(): void
     {
-        $stream = Utils::streamFor('<?xml version="1.0" encoding="utf-8"?><foo />');
+        $stream = Utils::stream_for('<?xml version="1.0" encoding="utf-8"?><foo />');
 
-        StreamWrapper::register();
-        libxml_set_streams_context(StreamWrapper::createStreamContext($stream));
+        Stream_Wrapper::register();
+        libxml_set_streams_context(Stream_Wrapper::create_stream_context($stream));
         $reader = new \XMLReader();
 
         self::assertTrue($reader->open('guzzle://stream'));
@@ -174,10 +174,10 @@ class StreamWrapperTest extends TestCase
      */
     public function testXmlWriterWithStream(): void
     {
-        $stream = Utils::streamFor(fopen('php://memory', 'wb'));
+        $stream = Utils::stream_for(fopen('php://memory', 'wb'));
 
-        StreamWrapper::register();
-        libxml_set_streams_context(StreamWrapper::createStreamContext($stream));
+        Stream_Wrapper::register();
+        libxml_set_streams_context(Stream_Wrapper::create_stream_context($stream));
         $writer = new \XMLWriter();
 
         self::assertTrue($writer->openURI('guzzle://stream'));
@@ -191,13 +191,11 @@ class StreamWrapperTest extends TestCase
 
     public function testWrappedNullSizedStreamStaysNullSized(): void
     {
-        $nullSizedStream = new Psr7\PumpStream(function () {
-            return '';
-        });
+        $nullSizedStream = new Psr7\Pump_Stream(function () { return ''; });
         $this->assertNull($nullSizedStream->getSize());
 
-        $resource = StreamWrapper::getResource($nullSizedStream);
-        $stream = Utils::streamFor($resource);
+        $resource = Stream_Wrapper::get_resource($nullSizedStream);
+        $stream = Utils::stream_for($resource);
 
         $this->assertNull($stream->getSize());
     }

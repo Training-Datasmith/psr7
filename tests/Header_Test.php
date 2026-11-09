@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7;
+use Guzzle_Http\Psr7;
 use PHPUnit\Framework\TestCase;
 
 class HeaderTest extends TestCase
@@ -156,27 +156,27 @@ class HeaderTest extends TestCase
      */
     public function testSplitList($header, $result): void
     {
-        self::assertSame($result, Psr7\Header::splitList($header));
+        self::assertSame($result, Psr7\Header::split_list($header));
     }
 
     public function testSplitListRejectsNestedArrays(): void
     {
         $this->expectException(\TypeError::class);
 
-        Psr7\Header::splitList([['foo']]);
+        Psr7\Header::split_list([['foo']]);
     }
 
     public function testSplitListArrayContainingNonStrings(): void
     {
         $this->expectException(\TypeError::class);
 
-        Psr7\Header::splitList(['foo', 'bar', 1, false]);
+        Psr7\Header::split_list(['foo', 'bar', 1, false]);
     }
 
     public function testSplitListRejectsNonStrings(): void
     {
         $this->expectException(\TypeError::class);
 
-        Psr7\Header::splitList(false);
+        Psr7\Header::split_list(false);
     }
 }

@@ -1,0 +1,1 @@
+Guzzle_Http\Tests\Psr7\UtilsTest::testGetsContentsThrowExceptionWhenNotReadable

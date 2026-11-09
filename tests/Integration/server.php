@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require dirname(__DIR__, 2).'/vendor/autoload.php';
 
-$request = GuzzleHttp\Psr7\ServerRequest::fromGlobals();
+$request = Guzzle_Http\Psr7\Server_Request::from_globals();
 
 $output = [
     'method' => $request->getMethod(),

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7\Stream;
-use GuzzleHttp\Psr7\UploadedFile;
+use Guzzle_Http\Psr7\Stream;
+use Guzzle_Http\Psr7\Uploaded_File;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 
 /**
- * @covers \GuzzleHttp\Psr7\UploadedFile
+ * @covers \Guzzle_Http\Psr7\Uploaded_File
  */
-class UploadedFileTest extends TestCase
+class Uploaded_FileTest extends TestCase
 {
     private $cleanup;
 
@@ -46,17 +46,17 @@ class UploadedFileTest extends TestCase
     /**
      * @dataProvider invalidStreams
      */
-    public function testRaisesExceptionOnInvalidStreamOrFile($streamOrFile): void
+    public function testRaisesExceptionOnInvalidStreamOrFile($stream_or_file): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        new UploadedFile($streamOrFile, 0, UPLOAD_ERR_OK);
+        new Uploaded_File($stream_or_file, 0, UPLOAD_ERR_OK);
     }
 
     public function testGetStreamReturnsOriginalStreamObject(): void
     {
         $stream = new Stream(fopen('php://temp', 'r'));
-        $upload = new UploadedFile($stream, 0, UPLOAD_ERR_OK);
+        $upload = new Uploaded_File($stream, 0, UPLOAD_ERR_OK);
 
         self::assertSame($stream, $upload->getStream());
     }
@@ -64,7 +64,7 @@ class UploadedFileTest extends TestCase
     public function testGetStreamReturnsWrappedPhpStream(): void
     {
         $stream = fopen('php://temp', 'wb+');
-        $upload = new UploadedFile($stream, 0, UPLOAD_ERR_OK);
+        $upload = new Uploaded_File($stream, 0, UPLOAD_ERR_OK);
         $uploadStream = $upload->getStream()->detach();
 
         self::assertSame($stream, $uploadStream);
@@ -73,7 +73,7 @@ class UploadedFileTest extends TestCase
     public function testGetStreamReturnsStreamForFile(): void
     {
         $this->cleanup[] = $stream = tempnam(sys_get_temp_dir(), 'stream_file');
-        $upload = new UploadedFile($stream, 0, UPLOAD_ERR_OK);
+        $upload = new Uploaded_File($stream, 0, UPLOAD_ERR_OK);
         $uploadStream = $upload->getStream();
         $r = new ReflectionProperty($uploadStream, 'filename');
 
@@ -86,8 +86,8 @@ class UploadedFileTest extends TestCase
 
     public function testSuccessful(): void
     {
-        $stream = \GuzzleHttp\Psr7\Utils::streamFor('Foo bar!');
-        $upload = new UploadedFile($stream, $stream->getSize(), UPLOAD_ERR_OK, 'filename.txt', 'text/plain');
+        $stream = \Guzzle_Http\Psr7\Utils::stream_for('Foo bar!');
+        $upload = new Uploaded_File($stream, $stream->getSize(), UPLOAD_ERR_OK, 'filename.txt', 'text/plain');
 
         self::assertSame($stream->getSize(), $upload->getSize());
         self::assertSame('filename.txt', $upload->getClientFilename());
@@ -118,8 +118,8 @@ class UploadedFileTest extends TestCase
      */
     public function testMoveRaisesExceptionForInvalidPath($path): void
     {
-        $stream = \GuzzleHttp\Psr7\Utils::streamFor('Foo bar!');
-        $upload = new UploadedFile($stream, 0, UPLOAD_ERR_OK);
+        $stream = \Guzzle_Http\Psr7\Utils::stream_for('Foo bar!');
+        $upload = new Uploaded_File($stream, 0, UPLOAD_ERR_OK);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('path');
@@ -128,8 +128,8 @@ class UploadedFileTest extends TestCase
 
     public function testMoveCannotBeCalledMoreThanOnce(): void
     {
-        $stream = \GuzzleHttp\Psr7\Utils::streamFor('Foo bar!');
-        $upload = new UploadedFile($stream, 0, UPLOAD_ERR_OK);
+        $stream = \Guzzle_Http\Psr7\Utils::stream_for('Foo bar!');
+        $upload = new Uploaded_File($stream, 0, UPLOAD_ERR_OK);
 
         $this->cleanup[] = $to = tempnam(sys_get_temp_dir(), 'diac');
         $upload->moveTo($to);
@@ -142,8 +142,8 @@ class UploadedFileTest extends TestCase
 
     public function testCannotRetrieveStreamAfterMove(): void
     {
-        $stream = \GuzzleHttp\Psr7\Utils::streamFor('Foo bar!');
-        $upload = new UploadedFile($stream, 0, UPLOAD_ERR_OK);
+        $stream = \Guzzle_Http\Psr7\Utils::stream_for('Foo bar!');
+        $upload = new Uploaded_File($stream, 0, UPLOAD_ERR_OK);
 
         $this->cleanup[] = $to = tempnam(sys_get_temp_dir(), 'diac');
         $upload->moveTo($to);
@@ -172,7 +172,7 @@ class UploadedFileTest extends TestCase
      */
     public function testConstructorDoesNotRaiseExceptionForInvalidStreamWhenErrorStatusPresent($status): void
     {
-        $uploadedFile = new UploadedFile('not ok', 0, $status);
+        $uploadedFile = new Uploaded_File('not ok', 0, $status);
         self::assertSame($status, $uploadedFile->getError());
     }
 
@@ -181,7 +181,7 @@ class UploadedFileTest extends TestCase
      */
     public function testMoveToRaisesExceptionWhenErrorStatusPresent($status): void
     {
-        $uploadedFile = new UploadedFile('not ok', 0, $status);
+        $uploadedFile = new Uploaded_File('not ok', 0, $status);
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('upload error');
         $uploadedFile->moveTo(__DIR__.'/'.bin2hex(random_bytes(20)));
@@ -192,7 +192,7 @@ class UploadedFileTest extends TestCase
      */
     public function testGetStreamRaisesExceptionWhenErrorStatusPresent($status): void
     {
-        $uploadedFile = new UploadedFile('not ok', 0, $status);
+        $uploadedFile = new Uploaded_File('not ok', 0, $status);
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('upload error');
         $uploadedFile->getStream();
@@ -205,7 +205,7 @@ class UploadedFileTest extends TestCase
 
         copy(__FILE__, $from);
 
-        $uploadedFile = new UploadedFile($from, 100, UPLOAD_ERR_OK, basename($from), 'text/plain');
+        $uploadedFile = new Uploaded_File($from, 100, UPLOAD_ERR_OK, basename($from), 'text/plain');
         $uploadedFile->moveTo($to);
 
         self::assertFileEquals(__FILE__, $to);

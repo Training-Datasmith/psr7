@@ -2,39 +2,39 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7;
-use GuzzleHttp\Psr7\InflateStream;
-use GuzzleHttp\Psr7\NoSeekStream;
+use Guzzle_Http\Psr7;
+use Guzzle_Http\Psr7\Inflate_Stream;
+use Guzzle_Http\Psr7\No_Seek_Stream;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @requires extension zlib
  */
-class InflateStreamTest extends TestCase
+class Inflate_Stream_Test extends TestCase
 {
     public function testInflatesRfc1952Streams(): void
     {
         $content = gzencode('test');
-        $a = Psr7\Utils::streamFor($content);
-        $b = new InflateStream($a);
+        $a = Psr7\Utils::stream_for($content);
+        $b = new Inflate_Stream($a);
         self::assertSame('test', (string) $b);
     }
 
     public function testInflatesStreamsRfc1952WithFilename(): void
     {
         $content = $this->getGzipStringWithFilename('test');
-        $a = Psr7\Utils::streamFor($content);
-        $b = new InflateStream($a);
+        $a = Psr7\Utils::stream_for($content);
+        $b = new Inflate_Stream($a);
         self::assertSame('test', (string) $b);
     }
 
     public function testInflatesRfc1950Streams(): void
     {
         $content = gzcompress('test');
-        $a = Psr7\Utils::streamFor($content);
-        $b = new InflateStream($a);
+        $a = Psr7\Utils::stream_for($content);
+        $b = new Inflate_Stream($a);
         self::assertSame('test', (string) $b);
     }
 
@@ -60,22 +60,22 @@ class InflateStreamTest extends TestCase
         // crc16
         $header .= pack('v', crc32($header));
 
-        $a = Psr7\Utils::streamFor($header.$content);
-        $b = new InflateStream($a);
+        $a = Psr7\Utils::stream_for($header.$content);
+        $b = new Inflate_Stream($a);
         self::assertSame('test', (string) $b);
     }
 
     public function testInflatesStreamsPreserveSeekable(): void
     {
         $content = gzencode('test');
-        $seekable = Psr7\Utils::streamFor($content);
+        $seekable = Psr7\Utils::stream_for($content);
 
-        $seekableInflate = new InflateStream($seekable);
+        $seekableInflate = new Inflate_Stream($seekable);
         self::assertTrue($seekableInflate->isSeekable());
         self::assertSame('test', (string) $seekableInflate);
 
-        $nonSeekable = new NoSeekStream(Psr7\Utils::streamFor($content));
-        $nonSeekableInflate = new InflateStream($nonSeekable);
+        $nonSeekable = new No_Seek_Stream(Psr7\Utils::stream_for($content));
+        $nonSeekableInflate = new Inflate_Stream($nonSeekable);
         self::assertFalse($nonSeekableInflate->isSeekable());
         self::assertSame('test', (string) $nonSeekableInflate);
     }

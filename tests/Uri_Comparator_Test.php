@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\Psr7\UriComparator;
+use Guzzle_Http\Psr7\Uri;
+use Guzzle_Http\Psr7\Uri_Comparator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \GuzzleHttp\Psr7\UriComparator
+ * @covers \Guzzle_Http\Psr7\Uri_Comparator
  */
-class UriComparatorTest extends TestCase
+class Uri_ComparatorTest extends TestCase
 {
     /**
      * @dataProvider getCrossOriginExamples
      */
     public function testIsCrossOrigin(string $original, string $modified, bool $expected): void
     {
-        self::assertSame($expected, UriComparator::isCrossOrigin(new Uri($original), new Uri($modified)));
+        self::assertSame($expected, Uri_Comparator::is_cross_origin(new Uri($original), new Uri($modified)));
     }
 
     public static function getCrossOriginExamples(): array

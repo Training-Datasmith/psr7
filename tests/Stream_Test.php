@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7\FnStream;
-use GuzzleHttp\Psr7\Stream;
-use GuzzleHttp\Psr7\StreamWrapper;
+use Guzzle_Http\Psr7\Fn_Stream;
+use Guzzle_Http\Psr7\Stream;
+use Guzzle_Http\Psr7\Stream_Wrapper;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \GuzzleHttp\Psr7\Stream
+ * @covers \Guzzle_Http\Psr7\Stream
  */
-class StreamTest extends TestCase
+class Stream_Test extends TestCase
 {
     public static $isFReadError = false;
 
@@ -239,7 +239,7 @@ class StreamTest extends TestCase
             restore_error_handler();
 
             self::assertCount(1, $errors);
-            self::assertStringStartsWith('GuzzleHttp\Psr7\Stream::__toString exception', $errors[0]['message']);
+            self::assertStringStartsWith('Guzzle_Http\Psr7\Stream::__toString exception', $errors[0]['message']);
             self::assertSame(E_USER_ERROR, $errors[0]['number']);
         }
     }
@@ -296,7 +296,7 @@ class StreamTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Unable to read from stream');
 
-        $r = StreamWrapper::getResource(new FnStream([
+        $r = Stream_Wrapper::get_resource(new Fn_Stream([
             'read' => function ($len): string {
                 throw new \ErrorException('Some error');
             },
@@ -451,11 +451,11 @@ class StreamTest extends TestCase
     }
 }
 
-namespace GuzzleHttp\Psr7;
+namespace Guzzle_Http\Psr7;
 
-use GuzzleHttp\Tests\Psr7\StreamTest;
+use Guzzle_Http\Tests\Psr7\Stream_Test;
 
 function fread($handle, $length)
 {
-    return StreamTest::$isFReadError ? false : \fread($handle, $length);
+    return Stream_Test::$isFReadError ? false : \fread($handle, $length);
 }

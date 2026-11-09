@@ -1,24 +1,30 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace Guzzle_Http\Psr7;
 
-use Psr\Http\Message\Stream_Interface;
+use Psr\Http\Message\StreamInterface;
+
 /**
  * Reads from multiple streams, one after the other.
  *
  * This is a read-only stream decorator.
  */
-final class Append_Stream implements Stream_Interface
+final class Append_Stream implements StreamInterface
 {
     /** @var StreamInterface[] Streams being decorated */
     private $streams = [];
+
     /** @var bool */
     private $seekable = true;
+
     /** @var int */
     private $current = 0;
+
     /** @var int */
     private $pos = 0;
+
     /**
      * @param StreamInterface[] $streams Streams to decorate. Each stream must
      *                                   be readable.
@@ -29,41 +35,49 @@ final class Append_Stream implements Stream_Interface
             $this->add_stream($stream);
         }
     }
+
     public function __toString(): string
     {
         try {
             $this->rewind();
-            return $this->get_contents();
+
+            return $this->getContents();
         } catch (\Throwable $e) {
             if (\PHP_VERSION_ID >= 70400) {
                 throw $e;
             }
             trigger_error(sprintf('%s::__toString exception: %s', self::class, (string) $e), E_USER_ERROR);
+
             return '';
         }
     }
+
     /**
-     * Add a stream to the AppendStream
+     * Add a stream to the Append_Stream
      *
      * @param StreamInterface $stream Stream to append. Must be readable.
      *
      * @throws \InvalidArgumentException if the stream is not readable
      */
-    public function add_stream(Stream_Interface $stream): void
+    public function add_stream(StreamInterface $stream): void
     {
-        if (!$stream->is_readable()) {
+        if (!$stream->isReadable()) {
             throw new \InvalidArgumentException('Each stream must be readable');
         }
+
         // The stream is only seekable if all streams are seekable
-        if (!$stream->is_seekable()) {
+        if (!$stream->isSeekable()) {
             $this->seekable = false;
         }
+
         $this->streams[] = $stream;
     }
-    public function get_contents(): string
+
+    public function getContents(): string
     {
         return Utils::copy_to_string($this);
     }
+
     /**
      * Closes each attached stream.
      */
@@ -71,11 +85,14 @@ final class Append_Stream implements Stream_Interface
     {
         $this->pos = $this->current = 0;
         $this->seekable = true;
+
         foreach ($this->streams as $stream) {
             $stream->close();
         }
+
         $this->streams = [];
     }
+
     /**
      * Detaches each attached stream.
      *
@@ -85,62 +102,77 @@ final class Append_Stream implements Stream_Interface
     {
         $this->pos = $this->current = 0;
         $this->seekable = true;
+
         foreach ($this->streams as $stream) {
             $stream->detach();
         }
+
         $this->streams = [];
+
         return null;
     }
+
     public function tell(): int
     {
         return $this->pos;
     }
+
     /**
      * Tries to calculate the size by adding the size of each stream.
      *
      * If any of the streams do not return a valid number, then the size of the
      * append stream cannot be determined and null is returned.
      */
-    public function get_size(): ?int
+    public function getSize(): ?int
     {
         $size = 0;
+
         foreach ($this->streams as $stream) {
-            $s = $stream->get_size();
+            $s = $stream->getSize();
             if ($s === null) {
                 return null;
             }
             $size += $s;
         }
+
         return $size;
     }
+
     public function eof(): bool
     {
-        return !$this->streams || $this->current >= count($this->streams) - 1 && $this->streams[$this->current]->eof();
+        return !$this->streams
+            || ($this->current >= count($this->streams) - 1
+             && $this->streams[$this->current]->eof());
     }
+
     public function rewind(): void
     {
         $this->seek(0);
     }
+
     /**
      * Attempts to seek to the given position. Only supports SEEK_SET.
      */
     public function seek($offset, $whence = SEEK_SET): void
     {
         if (!$this->seekable) {
-            throw new \RuntimeException('This AppendStream is not seekable');
+            throw new \RuntimeException('This Append_Stream is not seekable');
+        } elseif ($whence !== SEEK_SET) {
+            throw new \RuntimeException('The Append_Stream can only seek with SEEK_SET');
         }
-        if ($whence !== SEEK_SET) {
-            throw new \RuntimeException('The AppendStream can only seek with SEEK_SET');
-        }
+
         $this->pos = $this->current = 0;
+
         // Rewind each stream
         foreach ($this->streams as $i => $stream) {
             try {
                 $stream->rewind();
             } catch (\Exception $e) {
-                throw new \RuntimeException('Unable to seek stream ' . $i . ' of the AppendStream', 0, $e);
+                throw new \RuntimeException('Unable to seek stream '
+                    .$i.' of the Append_Stream', 0, $e);
             }
         }
+
         // Seek to the actual position by reading from each stream
         while ($this->pos < $offset && !$this->eof()) {
             $result = $this->read(min(8096, $offset - $this->pos));
@@ -149,6 +181,7 @@ final class Append_Stream implements Stream_Interface
             }
         }
     }
+
     /**
      * Reads from all of the appended streams until the length is met or EOF.
      */
@@ -157,44 +190,58 @@ final class Append_Stream implements Stream_Interface
         $buffer = '';
         $total = count($this->streams) - 1;
         $remaining = $length;
-        $progress_to_next = false;
+        $progressToNext = false;
+
         while ($remaining > 0) {
             // Progress to the next stream if needed.
-            if ($progress_to_next || $this->streams[$this->current]->eof()) {
-                $progress_to_next = false;
+            if ($progressToNext || $this->streams[$this->current]->eof()) {
+                $progressToNext = false;
                 if ($this->current === $total) {
                     break;
                 }
                 ++$this->current;
             }
+
             $result = $this->streams[$this->current]->read($remaining);
+
             if ($result === '') {
-                $progress_to_next = true;
+                $progressToNext = true;
                 continue;
             }
+
             $buffer .= $result;
             $remaining = $length - strlen($buffer);
         }
+
         $this->pos += strlen($buffer);
+
         return $buffer;
     }
-    public function is_readable(): bool
+
+    public function isReadable(): bool
     {
         return true;
     }
-    public function is_writable(): bool
+
+    public function isWritable(): bool
     {
         return false;
     }
-    public function is_seekable(): bool
+
+    public function isSeekable(): bool
     {
         return $this->seekable;
     }
+
     public function write($string): int
     {
-        throw new \RuntimeException('Cannot write to an AppendStream');
+        throw new \RuntimeException('Cannot write to an Append_Stream');
     }
-    public function get_metadata($key = null): ?array
+
+    /**
+     * @return mixed
+     */
+    public function getMetadata($key = null)
     {
         return $key ? null : [];
     }

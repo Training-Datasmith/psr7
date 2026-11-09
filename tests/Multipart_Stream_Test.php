@@ -2,36 +2,36 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7;
-use GuzzleHttp\Psr7\MultipartStream;
+use Guzzle_Http\Psr7;
+use Guzzle_Http\Psr7\Multipart_Stream;
 use PHPUnit\Framework\TestCase;
 
-class MultipartStreamTest extends TestCase
+class Multipart_Stream_Test extends TestCase
 {
     public function testCreatesDefaultBoundary(): void
     {
-        $b = new MultipartStream();
-        self::assertNotEmpty($b->getBoundary());
+        $b = new Multipart_Stream();
+        self::assertNotEmpty($b->get_boundary());
     }
 
     public function testCanProvideBoundary(): void
     {
-        $b = new MultipartStream([], 'foo');
-        self::assertSame('foo', $b->getBoundary());
+        $b = new Multipart_Stream([], 'foo');
+        self::assertSame('foo', $b->get_boundary());
     }
 
     public function testIsNotWritable(): void
     {
-        $b = new MultipartStream();
+        $b = new Multipart_Stream();
         self::assertFalse($b->isWritable());
     }
 
     public function testCanCreateEmptyStream(): void
     {
-        $b = new MultipartStream();
-        $boundary = $b->getBoundary();
+        $b = new Multipart_Stream();
+        $boundary = $b->get_boundary();
         self::assertSame("--{$boundary}--\r\n", $b->getContents());
         self::assertSame(strlen($boundary) + 6, $b->getSize());
     }
@@ -39,13 +39,13 @@ class MultipartStreamTest extends TestCase
     public function testValidatesFilesArrayElement(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        new MultipartStream([['foo' => 'bar']]);
+        new Multipart_Stream([['foo' => 'bar']]);
     }
 
     public function testEnsuresFileHasName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        new MultipartStream([['contents' => 'bar']]);
+        new Multipart_Stream([['contents' => 'bar']]);
     }
 
     public function testThrowsWhenNameIsNotStringOrInt(): void
@@ -53,7 +53,7 @@ class MultipartStreamTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("The 'name' key must be a string or integer");
 
-        new MultipartStream([
+        new Multipart_Stream([
             [
                 'name' => ['invalid'],
                 'contents' => 'value',
@@ -63,7 +63,7 @@ class MultipartStreamTest extends TestCase
 
     public function testSerializesFields(): void
     {
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'foo',
                 'contents' => 'bar',
@@ -93,7 +93,7 @@ class MultipartStreamTest extends TestCase
 
     public function testSerializesNonStringFields(): void
     {
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'int',
                 'contents' => (int) 1,
@@ -142,7 +142,7 @@ class MultipartStreamTest extends TestCase
 
     public function testExpandsNestedArrayContents(): void
     {
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'foo',
                 'contents' => [
@@ -171,7 +171,7 @@ class MultipartStreamTest extends TestCase
 
     public function testExpandsFlatArrayContents(): void
     {
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'tags',
                 'contents' => ['php', 'guzzle', 'psr7'],
@@ -202,7 +202,7 @@ class MultipartStreamTest extends TestCase
 
     public function testExpandsAssociativeArrayContents(): void
     {
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'user',
                 'contents' => ['name' => 'John', 'email' => 'john@example.com'],
@@ -228,7 +228,7 @@ class MultipartStreamTest extends TestCase
 
     public function testExpandsDeeplyNestedArrayContents(): void
     {
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'data',
                 'contents' => [
@@ -255,7 +255,7 @@ class MultipartStreamTest extends TestCase
 
     public function testExpandsEmptyArrayContents(): void
     {
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'empty',
                 'contents' => [],
@@ -269,7 +269,7 @@ class MultipartStreamTest extends TestCase
 
     public function testExpandsArrayContentsWithMixedScalarTypes(): void
     {
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'mixed',
                 'contents' => [
@@ -315,7 +315,7 @@ class MultipartStreamTest extends TestCase
 
     public function testExpandsArrayContentsWithNumericStringKeys(): void
     {
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'items',
                 'contents' => ['10' => 'ten', '20' => 'twenty'],
@@ -344,7 +344,7 @@ class MultipartStreamTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("The 'filename' and 'headers' options cannot be used when 'contents' is an array");
 
-        new MultipartStream([
+        new Multipart_Stream([
             [
                 'name' => 'foo',
                 'contents' => ['bar' => 'baz'],
@@ -358,7 +358,7 @@ class MultipartStreamTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("The 'filename' and 'headers' options cannot be used when 'contents' is an array");
 
-        new MultipartStream([
+        new Multipart_Stream([
             [
                 'name' => 'foo',
                 'contents' => ['bar' => 'baz'],
@@ -369,7 +369,7 @@ class MultipartStreamTest extends TestCase
 
     public function testExpandsArrayContentsWithZeroName(): void
     {
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => '0',
                 'contents' => ['a' => 'value'],
@@ -390,7 +390,7 @@ class MultipartStreamTest extends TestCase
 
     public function testExpandsArrayContentsWithIntegerName(): void
     {
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 0,
                 'contents' => ['a' => 'value'],
@@ -414,7 +414,7 @@ class MultipartStreamTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("The 'filename' and 'headers' options cannot be used when 'contents' is an array");
 
-        new MultipartStream([
+        new Multipart_Stream([
             [
                 'name' => 'foo',
                 'contents' => ['bar' => 'baz'],
@@ -425,7 +425,7 @@ class MultipartStreamTest extends TestCase
 
     public function testExpandsArrayContentsWithNestedEmptyBranches(): void
     {
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'data',
                 'contents' => ['a' => [], 'b' => 'value'],
@@ -446,7 +446,7 @@ class MultipartStreamTest extends TestCase
 
     public function testExpandsArrayContentsWithEmptyStringName(): void
     {
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => '',
                 'contents' => ['a' => 'value'],
@@ -470,7 +470,7 @@ class MultipartStreamTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("The 'filename' and 'headers' options cannot be used when 'contents' is an array");
 
-        new MultipartStream([
+        new Multipart_Stream([
             [
                 'name' => 'foo',
                 'contents' => ['bar' => 'baz'],
@@ -484,7 +484,7 @@ class MultipartStreamTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("The 'filename' and 'headers' options cannot be used when 'contents' is an array");
 
-        new MultipartStream([
+        new Multipart_Stream([
             [
                 'name' => 'foo',
                 'contents' => ['bar' => 'baz'],
@@ -495,13 +495,13 @@ class MultipartStreamTest extends TestCase
 
     public function testExpandsArrayContentsWithStreamLeaves(): void
     {
-        $fileStream = Psr7\FnStream::decorate(Psr7\Utils::streamFor('file contents'), [
+        $fileStream = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for('file contents'), [
             'getMetadata' => static function (): string {
                 return '/path/to/document.pdf';
             },
         ]);
 
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'files',
                 'contents' => [
@@ -531,25 +531,25 @@ class MultipartStreamTest extends TestCase
 
     public function testSerializesFiles(): void
     {
-        $f1 = Psr7\FnStream::decorate(Psr7\Utils::streamFor('foo'), [
+        $f1 = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for('foo'), [
             'getMetadata' => static function (): string {
                 return '/foo/bar.txt';
             },
         ]);
 
-        $f2 = Psr7\FnStream::decorate(Psr7\Utils::streamFor('baz'), [
+        $f2 = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for('baz'), [
             'getMetadata' => static function (): string {
                 return '/foo/baz.jpg';
             },
         ]);
 
-        $f3 = Psr7\FnStream::decorate(Psr7\Utils::streamFor('bar'), [
+        $f3 = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for('bar'), [
             'getMetadata' => static function (): string {
                 return '/foo/bar.unknown';
             },
         ]);
 
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'foo',
                 'contents' => $f1,
@@ -594,13 +594,13 @@ class MultipartStreamTest extends TestCase
         $content = "LF\nCRLF\r\nCR\r";
         $contentLength = \strlen($content);
 
-        $f1 = Psr7\FnStream::decorate(Psr7\Utils::streamFor($content), [
+        $f1 = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for($content), [
             'getMetadata' => static function (): string {
                 return '/foo/newlines.txt';
             },
         ]);
 
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'newlines',
                 'contents' => $f1,
@@ -624,13 +624,13 @@ class MultipartStreamTest extends TestCase
 
     public function testSerializesFilesWithCustomHeaders(): void
     {
-        $f1 = Psr7\FnStream::decorate(Psr7\Utils::streamFor('foo'), [
+        $f1 = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for('foo'), [
             'getMetadata' => static function (): string {
                 return '/foo/bar.txt';
             },
         ]);
 
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'foo',
                 'contents' => $f1,
@@ -657,19 +657,19 @@ class MultipartStreamTest extends TestCase
 
     public function testSerializesFilesWithCustomHeadersAndMultipleValues(): void
     {
-        $f1 = Psr7\FnStream::decorate(Psr7\Utils::streamFor('foo'), [
+        $f1 = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for('foo'), [
             'getMetadata' => static function (): string {
                 return '/foo/bar.txt';
             },
         ]);
 
-        $f2 = Psr7\FnStream::decorate(Psr7\Utils::streamFor('baz'), [
+        $f2 = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for('baz'), [
             'getMetadata' => static function (): string {
                 return '/foo/baz.jpg';
             },
         ]);
 
-        $b = new MultipartStream([
+        $b = new Multipart_Stream([
             [
                 'name' => 'foo',
                 'contents' => $f1,
@@ -708,11 +708,11 @@ class MultipartStreamTest extends TestCase
     public function testCanCreateWithNoneMetadataStreamField(): void
     {
         $str = 'dummy text';
-        $a = Psr7\Utils::streamFor(static function () use ($str): string {
+        $a = Psr7\Utils::stream_for(static function () use ($str): string {
             return $str;
         });
-        $b = new Psr7\LimitStream($a, \strlen($str));
-        $c = new MultipartStream([
+        $b = new Psr7\Limit_Stream($a, \strlen($str));
+        $c = new Multipart_Stream([
             [
                 'name' => 'foo',
                 'contents' => $b,

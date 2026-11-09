@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7;
+use Guzzle_Http\Psr7;
 use PHPUnit\Framework\TestCase;
 
 class QueryTest extends TestCase

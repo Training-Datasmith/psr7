@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7\Exception\MalformedUriException;
-use GuzzleHttp\Psr7\Uri;
+use Guzzle_Http\Psr7\Exception\Malformed_Uri_Exception;
+use Guzzle_Http\Psr7\Uri;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriInterface;
 
 /**
- * @covers \GuzzleHttp\Psr7\Uri
+ * @covers \Guzzle_Http\Psr7\Uri
  */
 class UriTest extends TestCase
 {
@@ -66,7 +66,7 @@ class UriTest extends TestCase
      */
     public function testFromParts(string $input): void
     {
-        $uri = Uri::fromParts(parse_url($input));
+        $uri = Uri::from_parts(parse_url($input));
 
         self::assertSame($input, (string) $uri);
     }
@@ -105,7 +105,7 @@ class UriTest extends TestCase
      */
     public function testInvalidUrisThrowException(string $invalidUri): void
     {
-        $this->expectException(MalformedUriException::class);
+        $this->expectException(Malformed_Uri_Exception::class);
         new Uri($invalidUri);
     }
 
@@ -214,7 +214,7 @@ class UriTest extends TestCase
         $uri->expects(self::any())->method('getScheme')->willReturn($scheme);
         $uri->expects(self::any())->method('getPort')->willReturn($port);
 
-        self::assertSame($isDefaultPort, Uri::isDefaultPort($uri));
+        self::assertSame($isDefaultPort, Uri::is_default_port($uri));
     }
 
     public static function getPortTestCases(): iterable
@@ -240,85 +240,85 @@ class UriTest extends TestCase
 
     public function testIsAbsolute(): void
     {
-        self::assertTrue(Uri::isAbsolute(new Uri('http://example.org')));
-        self::assertFalse(Uri::isAbsolute(new Uri('//example.org')));
-        self::assertFalse(Uri::isAbsolute(new Uri('/abs-path')));
-        self::assertFalse(Uri::isAbsolute(new Uri('rel-path')));
+        self::assertTrue(Uri::is_absolute(new Uri('http://example.org')));
+        self::assertFalse(Uri::is_absolute(new Uri('//example.org')));
+        self::assertFalse(Uri::is_absolute(new Uri('/abs-path')));
+        self::assertFalse(Uri::is_absolute(new Uri('rel-path')));
     }
 
     public function testIsNetworkPathReference(): void
     {
-        self::assertFalse(Uri::isNetworkPathReference(new Uri('http://example.org')));
-        self::assertTrue(Uri::isNetworkPathReference(new Uri('//example.org')));
-        self::assertFalse(Uri::isNetworkPathReference(new Uri('/abs-path')));
-        self::assertFalse(Uri::isNetworkPathReference(new Uri('rel-path')));
+        self::assertFalse(Uri::is_network_path_reference(new Uri('http://example.org')));
+        self::assertTrue(Uri::is_network_path_reference(new Uri('//example.org')));
+        self::assertFalse(Uri::is_network_path_reference(new Uri('/abs-path')));
+        self::assertFalse(Uri::is_network_path_reference(new Uri('rel-path')));
     }
 
     public function testIsAbsolutePathReference(): void
     {
-        self::assertFalse(Uri::isAbsolutePathReference(new Uri('http://example.org')));
-        self::assertFalse(Uri::isAbsolutePathReference(new Uri('//example.org')));
-        self::assertTrue(Uri::isAbsolutePathReference(new Uri('/abs-path')));
-        self::assertTrue(Uri::isAbsolutePathReference(new Uri('/')));
-        self::assertFalse(Uri::isAbsolutePathReference(new Uri('rel-path')));
+        self::assertFalse(Uri::is_absolute_path_reference(new Uri('http://example.org')));
+        self::assertFalse(Uri::is_absolute_path_reference(new Uri('//example.org')));
+        self::assertTrue(Uri::is_absolute_path_reference(new Uri('/abs-path')));
+        self::assertTrue(Uri::is_absolute_path_reference(new Uri('/')));
+        self::assertFalse(Uri::is_absolute_path_reference(new Uri('rel-path')));
     }
 
     public function testIsRelativePathReference(): void
     {
-        self::assertFalse(Uri::isRelativePathReference(new Uri('http://example.org')));
-        self::assertFalse(Uri::isRelativePathReference(new Uri('//example.org')));
-        self::assertFalse(Uri::isRelativePathReference(new Uri('/abs-path')));
-        self::assertTrue(Uri::isRelativePathReference(new Uri('rel-path')));
-        self::assertTrue(Uri::isRelativePathReference(new Uri('')));
+        self::assertFalse(Uri::is_relative_path_reference(new Uri('http://example.org')));
+        self::assertFalse(Uri::is_relative_path_reference(new Uri('//example.org')));
+        self::assertFalse(Uri::is_relative_path_reference(new Uri('/abs-path')));
+        self::assertTrue(Uri::is_relative_path_reference(new Uri('rel-path')));
+        self::assertTrue(Uri::is_relative_path_reference(new Uri('')));
     }
 
     public function testIsSameDocumentReference(): void
     {
-        self::assertFalse(Uri::isSameDocumentReference(new Uri('http://example.org')));
-        self::assertFalse(Uri::isSameDocumentReference(new Uri('//example.org')));
-        self::assertFalse(Uri::isSameDocumentReference(new Uri('/abs-path')));
-        self::assertFalse(Uri::isSameDocumentReference(new Uri('rel-path')));
-        self::assertFalse(Uri::isSameDocumentReference(new Uri('?query')));
-        self::assertTrue(Uri::isSameDocumentReference(new Uri('')));
-        self::assertTrue(Uri::isSameDocumentReference(new Uri('#fragment')));
+        self::assertFalse(Uri::is_same_document_reference(new Uri('http://example.org')));
+        self::assertFalse(Uri::is_same_document_reference(new Uri('//example.org')));
+        self::assertFalse(Uri::is_same_document_reference(new Uri('/abs-path')));
+        self::assertFalse(Uri::is_same_document_reference(new Uri('rel-path')));
+        self::assertFalse(Uri::is_same_document_reference(new Uri('?query')));
+        self::assertTrue(Uri::is_same_document_reference(new Uri('')));
+        self::assertTrue(Uri::is_same_document_reference(new Uri('#fragment')));
 
         $baseUri = new Uri('http://example.org/path?foo=bar');
 
-        self::assertTrue(Uri::isSameDocumentReference(new Uri('#fragment'), $baseUri));
-        self::assertTrue(Uri::isSameDocumentReference(new Uri('?foo=bar#fragment'), $baseUri));
-        self::assertTrue(Uri::isSameDocumentReference(new Uri('/path?foo=bar#fragment'), $baseUri));
-        self::assertTrue(Uri::isSameDocumentReference(new Uri('path?foo=bar#fragment'), $baseUri));
-        self::assertTrue(Uri::isSameDocumentReference(new Uri('//example.org/path?foo=bar#fragment'), $baseUri));
-        self::assertTrue(Uri::isSameDocumentReference(new Uri('http://example.org/path?foo=bar#fragment'), $baseUri));
+        self::assertTrue(Uri::is_same_document_reference(new Uri('#fragment'), $baseUri));
+        self::assertTrue(Uri::is_same_document_reference(new Uri('?foo=bar#fragment'), $baseUri));
+        self::assertTrue(Uri::is_same_document_reference(new Uri('/path?foo=bar#fragment'), $baseUri));
+        self::assertTrue(Uri::is_same_document_reference(new Uri('path?foo=bar#fragment'), $baseUri));
+        self::assertTrue(Uri::is_same_document_reference(new Uri('//example.org/path?foo=bar#fragment'), $baseUri));
+        self::assertTrue(Uri::is_same_document_reference(new Uri('http://example.org/path?foo=bar#fragment'), $baseUri));
 
-        self::assertFalse(Uri::isSameDocumentReference(new Uri('https://example.org/path?foo=bar'), $baseUri));
-        self::assertFalse(Uri::isSameDocumentReference(new Uri('http://example.com/path?foo=bar'), $baseUri));
-        self::assertFalse(Uri::isSameDocumentReference(new Uri('http://example.org/'), $baseUri));
-        self::assertFalse(Uri::isSameDocumentReference(new Uri('http://example.org'), $baseUri));
+        self::assertFalse(Uri::is_same_document_reference(new Uri('https://example.org/path?foo=bar'), $baseUri));
+        self::assertFalse(Uri::is_same_document_reference(new Uri('http://example.com/path?foo=bar'), $baseUri));
+        self::assertFalse(Uri::is_same_document_reference(new Uri('http://example.org/'), $baseUri));
+        self::assertFalse(Uri::is_same_document_reference(new Uri('http://example.org'), $baseUri));
 
-        self::assertFalse(Uri::isSameDocumentReference(new Uri('urn:/path'), new Uri('urn://example.com/path')));
+        self::assertFalse(Uri::is_same_document_reference(new Uri('urn:/path'), new Uri('urn://example.com/path')));
     }
 
     public function testAddAndRemoveQueryValues(): void
     {
         $uri = new Uri();
-        $uri = Uri::withQueryValue($uri, 'a', 'b');
-        $uri = Uri::withQueryValue($uri, 'c', 'd');
-        $uri = Uri::withQueryValue($uri, 'e', null);
+        $uri = Uri::with_query_value($uri, 'a', 'b');
+        $uri = Uri::with_query_value($uri, 'c', 'd');
+        $uri = Uri::with_query_value($uri, 'e', null);
         self::assertSame('a=b&c=d&e', $uri->getQuery());
 
-        $uri = Uri::withoutQueryValue($uri, 'c');
+        $uri = Uri::without_query_value($uri, 'c');
         self::assertSame('a=b&e', $uri->getQuery());
-        $uri = Uri::withoutQueryValue($uri, 'e');
+        $uri = Uri::without_query_value($uri, 'e');
         self::assertSame('a=b', $uri->getQuery());
-        $uri = Uri::withoutQueryValue($uri, 'a');
+        $uri = Uri::without_query_value($uri, 'a');
         self::assertSame('', $uri->getQuery());
     }
 
     public function testScalarQueryValues(): void
     {
         $uri = new Uri();
-        $uri = Uri::withQueryValues($uri, [
+        $uri = Uri::with_query_values($uri, [
             2 => 2,
             1 => true,
             'false' => false,
@@ -331,7 +331,7 @@ class UriTest extends TestCase
     public function testWithQueryValues(): void
     {
         $uri = new Uri();
-        $uri = Uri::withQueryValues($uri, [
+        $uri = Uri::with_query_values($uri, [
             'key1' => 'value1',
             'key2' => 'value2',
         ]);
@@ -343,12 +343,12 @@ class UriTest extends TestCase
     {
         $uri = new Uri();
 
-        $uri = Uri::withQueryValues($uri, [
+        $uri = Uri::with_query_values($uri, [
             'key1' => 'value1',
             'key2' => 'value2',
         ]);
 
-        $uri = Uri::withQueryValues($uri, [
+        $uri = Uri::with_query_values($uri, [
             'key2' => 'newvalue',
         ]);
 
@@ -358,46 +358,46 @@ class UriTest extends TestCase
     public function testWithQueryValueReplacesSameKeys(): void
     {
         $uri = new Uri();
-        $uri = Uri::withQueryValue($uri, 'a', 'b');
-        $uri = Uri::withQueryValue($uri, 'c', 'd');
-        $uri = Uri::withQueryValue($uri, 'a', 'e');
+        $uri = Uri::with_query_value($uri, 'a', 'b');
+        $uri = Uri::with_query_value($uri, 'c', 'd');
+        $uri = Uri::with_query_value($uri, 'a', 'e');
         self::assertSame('c=d&a=e', $uri->getQuery());
     }
 
     public function testWithoutQueryValueRemovesAllSameKeys(): void
     {
         $uri = (new Uri())->withQuery('a=b&c=d&a=e');
-        $uri = Uri::withoutQueryValue($uri, 'a');
+        $uri = Uri::without_query_value($uri, 'a');
         self::assertSame('c=d', $uri->getQuery());
     }
 
     public function testRemoveNonExistingQueryValue(): void
     {
         $uri = new Uri();
-        $uri = Uri::withQueryValue($uri, 'a', 'b');
-        $uri = Uri::withoutQueryValue($uri, 'c');
+        $uri = Uri::with_query_value($uri, 'a', 'b');
+        $uri = Uri::without_query_value($uri, 'c');
         self::assertSame('a=b', $uri->getQuery());
     }
 
     public function testWithQueryValueHandlesEncoding(): void
     {
         $uri = new Uri();
-        $uri = Uri::withQueryValue($uri, 'E=mc^2', 'ein&stein');
+        $uri = Uri::with_query_value($uri, 'E=mc^2', 'ein&stein');
         self::assertSame('E%3Dmc%5E2=ein%26stein', $uri->getQuery(), 'Decoded key/value get encoded');
 
         $uri = new Uri();
-        $uri = Uri::withQueryValue($uri, 'E%3Dmc%5e2', 'ein%26stein');
+        $uri = Uri::with_query_value($uri, 'E%3Dmc%5e2', 'ein%26stein');
         self::assertSame('E%3Dmc%5e2=ein%26stein', $uri->getQuery(), 'Encoded key/value do not get double-encoded');
     }
 
     public function testWithQueryValueEncodesPlusSign(): void
     {
         $uri = new Uri();
-        $uri = Uri::withQueryValue($uri, 'a+b', 'c+d');
+        $uri = Uri::with_query_value($uri, 'a+b', 'c+d');
         self::assertSame('a%2Bb=c%2Bd', $uri->getQuery(), 'Plus signs in key and value get encoded to %2B');
 
         $uri = new Uri();
-        $uri = Uri::withQueryValue($uri, 'query', 'a+b c');
+        $uri = Uri::with_query_value($uri, 'query', 'a+b c');
         self::assertSame('query=a%2Bb%20c', $uri->getQuery(), 'Plus sign is encoded distinctly from space');
     }
 
@@ -406,11 +406,11 @@ class UriTest extends TestCase
         // It also tests that the case of the percent-encoding does not matter,
         // i.e. both lowercase "%3d" and uppercase "%5E" can be removed.
         $uri = (new Uri())->withQuery('E%3dmc%5E2=einstein&foo=bar');
-        $uri = Uri::withoutQueryValue($uri, 'E=mc^2');
+        $uri = Uri::without_query_value($uri, 'E=mc^2');
         self::assertSame('foo=bar', $uri->getQuery(), 'Handles key in decoded form');
 
         $uri = (new Uri())->withQuery('E%3dmc%5E2=einstein&foo=bar');
-        $uri = Uri::withoutQueryValue($uri, 'E%3Dmc%5e2');
+        $uri = Uri::without_query_value($uri, 'E%3Dmc%5e2');
         self::assertSame('foo=bar', $uri->getQuery(), 'Handles key in encoded form');
     }
 

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Tests\Psr7;
+namespace Guzzle_Http\Tests\Psr7;
 
-use GuzzleHttp\Psr7\BufferStream;
+use Guzzle_Http\Psr7\Buffer_Stream;
 use PHPUnit\Framework\TestCase;
 
-class BufferStreamTest extends TestCase
+class Buffer_Stream_Test extends TestCase
 {
     public function testHasMetadata(): void
     {
-        $b = new BufferStream(10);
+        $b = new Buffer_Stream(10);
         self::assertTrue($b->isReadable());
         self::assertTrue($b->isWritable());
         self::assertFalse($b->isSeekable());
@@ -22,7 +22,7 @@ class BufferStreamTest extends TestCase
 
     public function testRemovesReadDataFromBuffer(): void
     {
-        $b = new BufferStream();
+        $b = new Buffer_Stream();
         self::assertSame(3, $b->write('foo'));
         self::assertSame(3, $b->getSize());
         self::assertFalse($b->eof());
@@ -33,20 +33,20 @@ class BufferStreamTest extends TestCase
 
     public function testCanCastToStringOrGetContents(): void
     {
-        $b = new BufferStream();
+        $b = new Buffer_Stream();
         $b->write('foo');
         $b->write('baz');
         self::assertSame('foo', $b->read(3));
         $b->write('bar');
         self::assertSame('bazbar', (string) $b);
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Cannot determine the position of a BufferStream');
+        $this->expectExceptionMessage('Cannot determine the position of a Buffer_Stream');
         $b->tell();
     }
 
     public function testDetachClearsBuffer(): void
     {
-        $b = new BufferStream();
+        $b = new Buffer_Stream();
         $b->write('foo');
         $b->detach();
         self::assertTrue($b->eof());
@@ -56,7 +56,7 @@ class BufferStreamTest extends TestCase
 
     public function testExceedingHighwaterMarkReturnsFalseButStillBuffers(): void
     {
-        $b = new BufferStream(5);
+        $b = new Buffer_Stream(5);
         self::assertSame(3, $b->write('hi '));
         self::assertSame(0, $b->write('hello'));
         self::assertSame('hi hello', (string) $b);

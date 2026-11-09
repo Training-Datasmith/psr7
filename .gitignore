@@ -2,6 +2,7 @@
 .php-cs-fixer.php
 .php-cs-fixer.cache
 .phpunit.result.cache
+.baseline-worktree/
 composer.lock
 vendor/
 /phpstan.neon
