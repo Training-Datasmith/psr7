@@ -68,29 +68,29 @@ final class Uri_Resolver
 
         if ($rel->getAuthority() != '') {
             $target_authority = $rel->getAuthority();
-            $targetPath = self::remove_dot_segments($rel->getPath());
+            $target_path = self::remove_dot_segments($rel->getPath());
             $target_query = $rel->getQuery();
         } else {
             $target_authority = $base->getAuthority();
             if ($rel->getPath() === '') {
-                $targetPath = $base->getPath();
+                $target_path = $base->getPath();
                 $target_query = $rel->getQuery() != '' ? $rel->getQuery() : $base->getQuery();
             } else {
                 if ($rel->getPath()[0] === '/') {
-                    $targetPath = $rel->getPath();
+                    $target_path = $rel->getPath();
                 } else {
                     if ($target_authority != '' && $base->getPath() === '') {
-                        $targetPath = '/'.$rel->getPath();
+                        $target_path = '/'.$rel->getPath();
                     } else {
                         $last_slash_pos = strrpos($base->getPath(), '/');
                         if ($last_slash_pos === false) {
-                            $targetPath = $rel->getPath();
+                            $target_path = $rel->getPath();
                         } else {
-                            $targetPath = substr($base->getPath(), 0, $last_slash_pos + 1).$rel->getPath();
+                            $target_path = substr($base->getPath(), 0, $last_slash_pos + 1).$rel->getPath();
                         }
                     }
                 }
-                $targetPath = self::remove_dot_segments($targetPath);
+                $target_path = self::remove_dot_segments($target_path);
                 $target_query = $rel->getQuery();
             }
         }
@@ -98,7 +98,7 @@ final class Uri_Resolver
         return new Uri(Uri::compose_components(
             $base->getScheme(),
             $target_authority,
-            $targetPath,
+            $target_path,
             $target_query,
             $rel->getFragment()
         ));

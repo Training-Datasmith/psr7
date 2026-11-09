@@ -1,13 +1,5 @@
-# PSR-7 / PSR-17 interface methods and PHP-native / PHPUnit identifiers allowed in camelCase.
-# One bare identifier per line; lines starting with # are ignored.
-preserveHost
-targetPath
-clientFilename
-clientMediaType
-serverParams
-uploadedFiles
-reasonPhrase
-requestTarget
+# PSR-7 / PSR-17 public method names (declarations/overrides in src/) and PHP / PHPUnit APIs.
+# Not used for variables — see upstream-parameter-allowlist.txt for contextual parameters.
 createRequest
 createResponse
 createServerRequest
@@ -130,32 +122,8 @@ assertGreaterThan
 assertLessThan
 assertEmpty
 assertNotEmpty
-assertSame
-getMockBuilder
-willReturnCallback
-withConsecutive
-throwException
-callback
-anything
-expects
-method
-getMock
-mock
-getName
-getMessage
-addToAssertionCount
-fail
-markTestIncomplete
-markTestSkipped
-attribute
-file
-line
-message
-code
 assertCount
 assertArrayNotHasKey
-assertStringNotContainsString
-assertFileExists
 expectException
 expectExceptionMessage
 expectExceptionMessageMatches
@@ -218,4 +186,3 @@ AssertionError
 Directory
 SplFileInfo
 Phar
-EOF

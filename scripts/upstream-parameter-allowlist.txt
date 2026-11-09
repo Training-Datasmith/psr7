@@ -1,0 +1,4 @@
+# CamelCase parameter names allowed only inside the listed class method body/signature.
+# Format: ClassName::methodName::parameterName
+Uploaded_File::moveTo::targetPath
+Request::withUri::preserveHost

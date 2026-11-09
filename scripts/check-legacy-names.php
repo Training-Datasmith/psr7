@@ -5,18 +5,54 @@ declare(strict_types=1);
 $root = dirname(__DIR__);
 
 /** @return array<string, true> */
-function load_upstream_allowlist(string $path): array
+function load_method_allowlist(string $path): array
 {
-  $allowlist = [];
-  foreach (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [] as $line) {
-    $line = trim($line);
-    if ($line === '' || $line[0] === '#') {
-      continue;
+    $allowlist = [];
+    foreach (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [] as $line) {
+        $line = trim($line);
+        if ($line === '' || $line[0] === '#') {
+            continue;
+        }
+        $allowlist[$line] = true;
     }
-    $allowlist[$line] = true;
-  }
 
-  return $allowlist;
+    return $allowlist;
+}
+
+/**
+ * @return array<string, list<string>>
+ */
+function load_parameter_allowlist(string $path): array
+{
+    $map = [];
+    foreach (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [] as $line) {
+        $line = trim($line);
+        if ($line === '' || $line[0] === '#') {
+            continue;
+        }
+        $parts = explode('::', $line);
+        if (count($parts) !== 3) {
+            fwrite(STDERR, "check-legacy-names: invalid parameter allowlist entry: {$line}\n");
+            exit(1);
+        }
+        [$class, $method, $parameter] = $parts;
+        $key = $class . '::' . $method;
+        if (!isset($map[$key])) {
+            $map[$key] = [];
+        }
+        $map[$key][] = $parameter;
+    }
+
+    return $map;
+}
+
+function extract_class_name(string $code): ?string
+{
+    if (preg_match('/^\s*(?:final\s+|abstract\s+)?class\s+([A-Za-z0-9_]+)/m', $code, $matches) !== 1) {
+        return null;
+    }
+
+    return $matches[1];
 }
 
 function is_repo_camelcase_identifier(string $name): bool
@@ -29,78 +65,110 @@ function is_repo_camelcase_identifier(string $name): bool
 }
 
 /**
- * @param array<string, true> $allowlist
+ * @param array<string, true> $methodAllowlist
+ * @param array<string, list<string>> $parameterAllowlist
  * @return list<string>
  */
-function collect_snake_case_violations(string $filePath, string $code, array $allowlist): array
-{
-  $violations = [];
-  $tokens = token_get_all($code);
-  $expectFunctionName = false;
+function collect_snake_case_violations(
+    string $filePath,
+    string $code,
+    array $methodAllowlist,
+    array $parameterAllowlist
+): array {
+    $violations = [];
+    $tokens = token_get_all($code);
+    $expectFunctionName = false;
+    $underSrc = strpos($filePath, '/src/') !== false;
+    $className = extract_class_name($code);
+    $currentFunction = null;
+    /** @var array<string, true> */
+    $scopedParameters = [];
 
-  foreach ($tokens as $token) {
-    if (!is_array($token)) {
-      if ($token === '(') {
-        $expectFunctionName = false;
-      }
-      continue;
+    foreach ($tokens as $token) {
+        if (!is_array($token)) {
+            if ($token === '{') {
+                // keep scopedParameters for function body
+            }
+            if ($token === '(') {
+                $expectFunctionName = false;
+            }
+            continue;
+        }
+
+        [$id, $text] = $token;
+
+        if ($id === T_FUNCTION) {
+            $expectFunctionName = true;
+            $currentFunction = null;
+            $scopedParameters = [];
+            continue;
+        }
+
+        if ($expectFunctionName && $id === T_STRING) {
+            $currentFunction = $text;
+            if ($underSrc && is_repo_camelcase_identifier($text) && !isset($methodAllowlist[$text])) {
+                $violations[] = sprintf('%s: repo-owned camelCase identifier %s', $filePath, $text);
+            }
+            if ($className !== null) {
+                $scopeKey = $className . '::' . $currentFunction;
+                $scopedParameters = [];
+                foreach ($parameterAllowlist[$scopeKey] ?? [] as $parameter) {
+                    $scopedParameters[$parameter] = true;
+                }
+            }
+            $expectFunctionName = false;
+            continue;
+        }
+
+        if ($expectFunctionName && $id !== T_WHITESPACE && $id !== T_COMMENT && $id !== T_DOC_COMMENT) {
+            $expectFunctionName = false;
+        }
+
+        if ($id === T_VARIABLE) {
+            $name = substr($text, 1);
+            if (!is_repo_camelcase_identifier($name)) {
+                continue;
+            }
+            if (isset($scopedParameters[$name])) {
+                continue;
+            }
+            $violations[] = sprintf('%s: repo-owned camelCase identifier $%s', $filePath, $name);
+        }
     }
 
-    [$id, $text] = $token;
-
-    if ($id === T_FUNCTION) {
-      $expectFunctionName = true;
-      continue;
-    }
-
-    if ($expectFunctionName && $id === T_STRING) {
-      if (is_repo_camelcase_identifier($text) && !isset($allowlist[$text])) {
-        $violations[] = sprintf('%s: repo-owned camelCase identifier %s', $filePath, $text);
-      }
-      $expectFunctionName = false;
-      continue;
-    }
-
-    if ($expectFunctionName && $id !== T_WHITESPACE && $id !== T_COMMENT && $id !== T_DOC_COMMENT) {
-      $expectFunctionName = false;
-    }
-
-    if ($id === T_VARIABLE) {
-      $name = substr($text, 1);
-      if (is_repo_camelcase_identifier($name) && !isset($allowlist[$name])) {
-        $violations[] = sprintf('%s: repo-owned camelCase identifier $%s', $filePath, $name);
-      }
-    }
-  }
-
-  return $violations;
+    return $violations;
 }
 
 /**
- * @param array<string, true> $allowlist
+ * @param array<string, true> $methodAllowlist
+ * @param array<string, list<string>> $parameterAllowlist
  * @return list<string>
  */
-function collect_snake_case_violations_tree(string $dir, array $allowlist): array
+function collect_snake_case_violations_tree(string $dir, array $methodAllowlist, array $parameterAllowlist): array
 {
-  $violations = [];
-  $iterator = new RecursiveIteratorIterator(
-    new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)
-  );
-  foreach ($iterator as $file) {
-    if ($file->getExtension() !== 'php') {
-      continue;
+    $violations = [];
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)
+    );
+    foreach ($iterator as $file) {
+        if ($file->getExtension() !== 'php') {
+            continue;
+        }
+        $contents = file_get_contents($file->getPathname());
+        if ($contents === false) {
+            continue;
+        }
+        $violations = array_merge(
+            $violations,
+            collect_snake_case_violations($file->getPathname(), $contents, $methodAllowlist, $parameterAllowlist)
+        );
     }
-    $contents = file_get_contents($file->getPathname());
-    if ($contents === false) {
-      continue;
-    }
-    $violations = array_merge($violations, collect_snake_case_violations($file->getPathname(), $contents, $allowlist));
-  }
 
-  return $violations;
+    return $violations;
 }
 
-$upstreamAllowlist = load_upstream_allowlist($root . '/scripts/upstream-identifier-allowlist.txt');
+$methodAllowlist = load_method_allowlist($root . '/scripts/upstream-identifier-allowlist.txt');
+$parameterAllowlist = load_parameter_allowlist($root . '/scripts/upstream-parameter-allowlist.txt');
 
 $scanPaths = [
     $root . '/src',
@@ -328,12 +396,45 @@ if (!is_string($demoUtilsContents) || $demoUtilsContents === $utilsTestContents)
     fwrite(STDERR, "check-legacy-names: camelCase identifier demo could not inject wrong variable name.\n");
     exit(1);
 }
-$demoSnakeViolations = collect_snake_case_violations($utilsTestFile, $demoUtilsContents, $upstreamAllowlist);
+$demoSnakeViolations = collect_snake_case_violations(
+    $utilsTestFile,
+    $demoUtilsContents,
+    $methodAllowlist,
+    $parameterAllowlist
+);
 if ($demoSnakeViolations === []) {
     fwrite(STDERR, "check-legacy-names: camelCase identifier demo did not fail.\n");
     exit(1);
 }
 fwrite(STDOUT, "check-legacy-names: camelCase identifier demo failed for injected variable name.\n");
+
+$uriResolverFile = $root . '/src/Uri_Resolver.php';
+$uriResolverContents = file_get_contents($uriResolverFile);
+if ($uriResolverContents === false) {
+    fwrite(STDERR, "check-legacy-names: could not read Uri_Resolver.php for contextual demo.\n");
+    exit(1);
+}
+$demoResolverContents = preg_replace(
+    '/public static function resolve\(UriInterface \$base, UriInterface \$rel\): UriInterface\s*\{/',
+    "public static function resolve(UriInterface \$base, UriInterface \$rel): UriInterface\n    {\n        \$targetPath = null;",
+    $uriResolverContents,
+    1
+);
+if (!is_string($demoResolverContents) || $demoResolverContents === $uriResolverContents) {
+    fwrite(STDERR, "check-legacy-names: contextual targetPath demo could not inject wrong variable name.\n");
+    exit(1);
+}
+$demoTargetPathViolations = collect_snake_case_violations(
+    $uriResolverFile,
+    $demoResolverContents,
+    $methodAllowlist,
+    $parameterAllowlist
+);
+if ($demoTargetPathViolations === []) {
+    fwrite(STDERR, "check-legacy-names: contextual targetPath demo did not fail.\n");
+    exit(1);
+}
+fwrite(STDOUT, "check-legacy-names: contextual targetPath demo failed for injected repo-owned variable.\n");
 
 $violations = [];
 foreach ($scanPaths as $path) {
@@ -349,8 +450,8 @@ foreach ($scanPaths as $path) {
 $violations = array_merge($violations, collect_class_file_mismatches([$root . '/src', $root . '/tests']));
 $violations = array_merge(
     $violations,
-    collect_snake_case_violations_tree($root . '/src', $upstreamAllowlist),
-    collect_snake_case_violations_tree($root . '/tests', $upstreamAllowlist)
+    collect_snake_case_violations_tree($root . '/src', $methodAllowlist, $parameterAllowlist),
+    collect_snake_case_violations_tree($root . '/tests', $methodAllowlist, $parameterAllowlist)
 );
 
 fwrite(STDOUT, "check-legacy-names: matcher rejects GuzzleHttp\\Psr7\\HttpFactory.\n");
@@ -365,5 +466,5 @@ if ($violations !== []) {
 
 fwrite(STDOUT, "check-legacy-names: no pre-rename repo-owned names remain.\n");
 fwrite(STDOUT, "check-legacy-names: all src and TestCase class names match their file basenames.\n");
-fwrite(STDOUT, "check-legacy-names: no repo-owned camelCase identifiers outside upstream allowlist.\n");
+fwrite(STDOUT, "check-legacy-names: no repo-owned camelCase identifiers outside scoped upstream allowlists.\n");
 exit(0);
