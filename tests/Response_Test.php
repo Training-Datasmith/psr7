@@ -13,7 +13,7 @@ use Psr\Http\Message\StreamInterface;
  * @covers \Guzzle_Http\Psr7\Message_Trait
  * @covers \Guzzle_Http\Psr7\Response
  */
-class ResponseTest extends TestCase
+class Response_Test extends TestCase
 {
     public function testDefaultConstructor(): void
     {

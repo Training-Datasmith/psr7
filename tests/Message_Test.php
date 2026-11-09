@@ -8,7 +8,7 @@ use Guzzle_Http\Psr7;
 use Guzzle_Http\Psr7\Fn_Stream;
 use PHPUnit\Framework\TestCase;
 
-class MessageTest extends TestCase
+class Message_Test extends TestCase
 {
     public function testConvertsRequestsToStrings(): void
     {

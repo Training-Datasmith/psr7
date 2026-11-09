@@ -14,7 +14,7 @@ use Psr\Http\Message\StreamInterface;
  * @covers \Guzzle_Http\Psr7\Message_Trait
  * @covers \Guzzle_Http\Psr7\Request
  */
-class RequestTest extends TestCase
+class Request_Test extends TestCase
 {
     public function testRequestUriMayBeString(): void
     {

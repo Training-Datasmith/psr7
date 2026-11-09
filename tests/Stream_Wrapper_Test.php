@@ -13,7 +13,7 @@ use Psr\Http\Message\StreamInterface;
 /**
  * @covers \Guzzle_Http\Psr7\Stream_Wrapper
  */
-class Stream_WrapperTest extends TestCase
+class Stream_Wrapper_Test extends TestCase
 {
     public function testResource(): void
     {

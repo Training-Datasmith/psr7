@@ -12,7 +12,7 @@ use Psr\Http\Message\UriInterface;
 /**
  * @covers \Guzzle_Http\Psr7\Uri_Normalizer
  */
-class Uri_NormalizerTest extends TestCase
+class Uri_Normalizer_Test extends TestCase
 {
     public function testCapitalizePercentEncoding(): void
     {

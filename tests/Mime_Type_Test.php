@@ -7,7 +7,7 @@ namespace Guzzle_Http\Tests\Psr7;
 use Guzzle_Http\Psr7;
 use PHPUnit\Framework\TestCase;
 
-class Mime_TypeTest extends TestCase
+class Mime_Type_Test extends TestCase
 {
     public function testDetermineFromExtension(): void
     {

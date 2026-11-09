@@ -6,7 +6,7 @@ namespace Guzzle_Http\Tests\Psr7\Integration;
 
 use PHPUnit\Framework\TestCase;
 
-class Server_RequestFromGlobalsTest extends TestCase
+class Server_Request_From_Globals_Test extends TestCase
 {
     protected function setUp(): void
     {

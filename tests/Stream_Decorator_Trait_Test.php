@@ -20,7 +20,7 @@ class Str implements StreamInterface
 /**
  * @covers \Guzzle_Http\Psr7\Stream_Decorator_Trait
  */
-class Stream_Decorator_TraitTest extends TestCase
+class Stream_Decorator_Trait_Test extends TestCase
 {
     /** @var StreamInterface */
     private $a;
@@ -133,12 +133,12 @@ class Stream_Decorator_TraitTest extends TestCase
     public function testThrowsWhenGetterNotImplemented(): void
     {
         $this->expectException(\BadMethodCallException::class);
-        $s = new BadStream();
+        $s = new Bad_Stream();
         $s->stream;
     }
 }
 
-class BadStream
+class Bad_Stream
 {
     use Stream_Decorator_Trait;
 

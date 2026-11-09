@@ -7,7 +7,7 @@ namespace Guzzle_Http\Tests\Psr7;
 use Guzzle_Http\Psr7;
 use PHPUnit\Framework\TestCase;
 
-class HeaderTest extends TestCase
+class Header_Test extends TestCase
 {
     public static function parseParamsProvider(): array
     {

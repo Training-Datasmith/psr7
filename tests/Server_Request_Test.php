@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @covers \Guzzle_Http\Psr7\Server_Request
  */
-class Server_RequestTest extends TestCase
+class Server_Request_Test extends TestCase
 {
     public static function dataNormalizeFiles(): iterable
     {

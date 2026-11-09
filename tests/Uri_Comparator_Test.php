@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @covers \Guzzle_Http\Psr7\Uri_Comparator
  */
-class Uri_ComparatorTest extends TestCase
+class Uri_Comparator_Test extends TestCase
 {
     /**
      * @dataProvider getCrossOriginExamples

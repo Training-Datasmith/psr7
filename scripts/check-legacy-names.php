@@ -39,8 +39,11 @@ $patterns = [
     '/\bMalformedUriException\b/',
     '/\bHasToString\b/',
     '/\bReadSeekOnlyStream\b/',
-    '/\bServerRequestTest\b/',
-    '/\bStreamTest\b/',
+    '/\bUtilsTest\b/',
+    '/\bResponseTest\b/',
+    '/\bRequestTest\b/',
+    '/\bBadStream\b/',
+    '/\bExtendedUriTest\b/',
     '/Request_Interface/',
     '/Response_Interface/',
     '/Server_Request_Interface/',
@@ -111,6 +114,107 @@ function scan_tree(string $dir, array $patterns): array
     return $hits;
 }
 
+/**
+ * @return list<string>
+ */
+function class_file_mismatches_for(string $phpPath, string $contents): array
+{
+    $basename = basename($phpPath, '.php');
+    $mismatches = [];
+
+    if (preg_match_all(
+        '/^\s*(?:final\s+|abstract\s+)?class\s+([A-Za-z0-9_]+)\s+extends\s+TestCase/m',
+        $contents,
+        $testMatches,
+        PREG_SET_ORDER
+    )) {
+        foreach ($testMatches as $match) {
+            $declared = $match[1];
+            if ($declared !== $basename) {
+                $mismatches[] = sprintf(
+                    '%s: TestCase class %s must match file basename %s',
+                    $phpPath,
+                    $declared,
+                    $basename
+                );
+            }
+        }
+    }
+
+    $underSrc = strpos($phpPath, '/src/') !== false || strpos($phpPath, '\\src\\') !== false;
+    if ($underSrc && preg_match_all(
+        '/^\s*(?:final\s+|abstract\s+)?(?:class|trait|interface)\s+([A-Za-z0-9_]+)/m',
+        $contents,
+        $srcMatches,
+        PREG_SET_ORDER
+    )) {
+        foreach ($srcMatches as $match) {
+            $declared = $match[1];
+            if ($declared !== $basename) {
+                $mismatches[] = sprintf(
+                    '%s: declared %s must match file basename %s',
+                    $phpPath,
+                    $declared,
+                    $basename
+                );
+            }
+        }
+    }
+
+    return $mismatches;
+}
+
+/**
+ * @return list<string>
+ */
+function class_file_mismatches(string $phpPath): array
+{
+    $contents = file_get_contents($phpPath);
+    if ($contents === false) {
+        return ["Could not read {$phpPath}"];
+    }
+
+    return class_file_mismatches_for($phpPath, $contents);
+}
+
+/**
+ * @return list<string>
+ */
+function collect_class_file_mismatches(array $roots): array
+{
+    $violations = [];
+    foreach ($roots as $path) {
+        if (!is_dir($path)) {
+            continue;
+        }
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS)
+        );
+        foreach ($iterator as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+            $violations = array_merge($violations, class_file_mismatches($file->getPathname()));
+        }
+    }
+
+    return $violations;
+}
+
+$responseTestFile = $root . '/tests/Response_Test.php';
+$responseContents = file_get_contents($responseTestFile);
+if ($responseContents === false) {
+    fwrite(STDERR, "check-legacy-names: could not read Response_Test.php for demo.\n");
+    exit(1);
+}
+$demoContents = str_replace('class Response_Test ', 'class ResponseTest ', $responseContents);
+$demoMismatches = class_file_mismatches_for($responseTestFile, $demoContents);
+if ($demoMismatches === []) {
+    fwrite(STDERR, "check-legacy-names: class/file mismatch demo did not fail.\n");
+    exit(1);
+}
+fwrite(STDOUT, "check-legacy-names: class/file mismatch demo failed for injected wrong class name.\n");
+
 $violations = [];
 foreach ($scanPaths as $path) {
     if (is_dir($path)) {
@@ -121,6 +225,8 @@ foreach ($scanPaths as $path) {
         $violations = array_merge($violations, scan_file($path, $patterns));
     }
 }
+
+$violations = array_merge($violations, collect_class_file_mismatches([$root . '/src', $root . '/tests']));
 
 fwrite(STDOUT, "check-legacy-names: matcher rejects GuzzleHttp\\Psr7\\HttpFactory.\n");
 fwrite(STDOUT, "check-legacy-names: matcher accepts Guzzle_Http\\Psr7\\Http_Factory.\n");
@@ -133,4 +239,5 @@ if ($violations !== []) {
 }
 
 fwrite(STDOUT, "check-legacy-names: no pre-rename repo-owned names remain.\n");
+fwrite(STDOUT, "check-legacy-names: all src and TestCase class names match their file basenames.\n");
 exit(0);

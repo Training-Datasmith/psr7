@@ -12,7 +12,7 @@ use Psr\Http\Message\UriInterface;
 /**
  * @covers \Guzzle_Http\Psr7\Uri
  */
-class UriTest extends TestCase
+class Uri_Test extends TestCase
 {
     public function testParsesProvidedUri(): void
     {
@@ -684,8 +684,8 @@ class UriTest extends TestCase
         // should not use late static binding to access private static members.
         // If they do, this will fatal.
         self::assertInstanceOf(
-            ExtendedUriTest::class,
-            new ExtendedUriTest('http://h:9/')
+            Extended_Uri_Test::class,
+            new Extended_Uri_Test('http://h:9/')
         );
     }
 
@@ -737,6 +737,6 @@ class UriTest extends TestCase
     }
 }
 
-class ExtendedUriTest extends Uri
+class Extended_Uri_Test extends Uri
 {
 }

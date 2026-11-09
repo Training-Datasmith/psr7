@@ -12,7 +12,7 @@ use Psr\Http\Message\UriInterface;
 /**
  * @covers \Guzzle_Http\Psr7\Uri_Resolver
  */
-class Uri_ResolverTest extends TestCase
+class Uri_Resolver_Test extends TestCase
 {
     private const RFC3986_BASE = 'http://a/b/c/d;p?q';
 

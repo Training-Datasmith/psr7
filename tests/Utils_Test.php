@@ -10,7 +10,7 @@ use Guzzle_Http\Psr7\No_Seek_Stream;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 
-class UtilsTest extends TestCase
+class Utils_Test extends TestCase
 {
     public function testCopiesToString(): void
     {

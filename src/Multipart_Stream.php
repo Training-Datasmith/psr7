@@ -60,7 +60,7 @@ final class Multipart_Stream implements StreamInterface
      *
      * @param string[] $headers
      */
-    private function getHeaders(array $headers): string
+    private function get_headers(array $headers): string
     {
         $str = '';
         foreach ($headers as $key => $value) {
@@ -130,7 +130,7 @@ final class Multipart_Stream implements StreamInterface
             $element['headers'] ?? []
         );
 
-        $stream->add_stream(Utils::stream_for($this->getHeaders($headers)));
+        $stream->add_stream(Utils::stream_for($this->get_headers($headers)));
         $stream->add_stream($body);
         $stream->add_stream(Utils::stream_for("\r\n"));
     }

@@ -12,7 +12,7 @@ use ReflectionProperty;
 /**
  * @covers \Guzzle_Http\Psr7\Uploaded_File
  */
-class Uploaded_FileTest extends TestCase
+class Uploaded_File_Test extends TestCase
 {
     private $cleanup;
 
