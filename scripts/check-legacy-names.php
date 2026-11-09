@@ -5,7 +5,7 @@ declare(strict_types=1);
 $root = dirname(__DIR__);
 
 /** @return array<string, true> */
-function load_method_allowlist(string $path): array
+function load_phpunit_hook_allowlist(string $path): array
 {
     $allowlist = [];
     foreach (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [] as $line) {
@@ -17,6 +17,108 @@ function load_method_allowlist(string $path): array
     }
 
     return $allowlist;
+}
+
+/**
+ * @return array<string, true>
+ */
+function load_psr_interface_method_names(): array
+{
+    $names = [];
+    $interfaces = [
+        \Psr\Http\Message\MessageInterface::class,
+        \Psr\Http\Message\RequestInterface::class,
+        \Psr\Http\Message\ResponseInterface::class,
+        \Psr\Http\Message\ServerRequestInterface::class,
+        \Psr\Http\Message\StreamInterface::class,
+        \Psr\Http\Message\UploadedFileInterface::class,
+        \Psr\Http\Message\UriInterface::class,
+        \Psr\Http\Message\RequestFactoryInterface::class,
+        \Psr\Http\Message\ResponseFactoryInterface::class,
+        \Psr\Http\Message\ServerRequestFactoryInterface::class,
+        \Psr\Http\Message\StreamFactoryInterface::class,
+        \Psr\Http\Message\UploadedFileFactoryInterface::class,
+        \Psr\Http\Message\UriFactoryInterface::class,
+    ];
+
+    foreach ($interfaces as $interface) {
+        if (!interface_exists($interface)) {
+            continue;
+        }
+        $ref = new ReflectionClass($interface);
+        foreach ($ref->getMethods() as $method) {
+            $names[$method->getName()] = true;
+        }
+    }
+
+    return $names;
+}
+
+/**
+ * @return array<string, true> keys like "Message_Trait::getHeaders"
+ */
+function build_scoped_upstream_method_allowlist(string $root): array
+{
+    $autoload = $root . '/vendor/autoload.php';
+    if (!is_readable($autoload)) {
+        fwrite(STDERR, "check-legacy-names: run composer update first (missing vendor/autoload.php).\n");
+        exit(1);
+    }
+    require_once $autoload;
+
+    $psrMethods = load_psr_interface_method_names();
+    $scoped = [];
+    foreach ([$root . '/src', $root . '/tests'] as $scanDir) {
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($scanDir, FilesystemIterator::SKIP_DOTS)
+        );
+        foreach ($iterator as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+            $code = file_get_contents($file->getPathname());
+            if ($code === false) {
+                continue;
+            }
+            if (!preg_match('/namespace\s+([^;]+);/', $code, $nsMatch)) {
+                continue;
+            }
+            $namespace = trim($nsMatch[1]);
+            $typeName = extract_type_name($code);
+            if ($typeName === null) {
+                continue;
+            }
+            $fqcn = $namespace . '\\' . $typeName;
+            if (!class_exists($fqcn) && !trait_exists($fqcn)) {
+                continue;
+            }
+            $ref = new ReflectionClass($fqcn);
+            foreach ($ref->getMethods() as $method) {
+                if ($method->getDeclaringClass()->getName() !== $fqcn) {
+                    continue;
+                }
+                $methodName = $method->getName();
+                if (!isset($psrMethods[$methodName])) {
+                    if ($methodName === 'jsonSerialize' && $ref->implementsInterface(\JsonSerializable::class)) {
+                        $scoped[$typeName . '::' . $methodName] = true;
+                    }
+                    continue;
+                }
+                if ($ref->isTrait()) {
+                    $scoped[$typeName . '::' . $methodName] = true;
+                    continue;
+                }
+                foreach ($ref->getInterfaces() as $interface) {
+                    if ($interface->hasMethod($methodName)) {
+                        $scoped[$typeName . '::' . $methodName] = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    return $scoped;
 }
 
 /**
@@ -55,6 +157,61 @@ function extract_class_name(string $code): ?string
     return $matches[1];
 }
 
+function extract_type_name(string $code): ?string
+{
+    if (preg_match('/^\s*trait\s+([A-Za-z0-9_]+)/m', $code, $matches) === 1) {
+        return $matches[1];
+    }
+
+    return extract_class_name($code);
+}
+
+function extends_test_case(string $code): bool
+{
+    return (bool) preg_match('/^\s*(?:final\s+|abstract\s+)?class\s+[A-Za-z0-9_]+\s+extends\s+TestCase\b/m', $code);
+}
+
+function is_snake_case_test_method_name(string $name): bool
+{
+    return (bool) preg_match('/^test_[a-z0-9_]+$/', $name);
+}
+
+/**
+ * @param array<string, true> $scopedMethodAllowlist
+ * @param array<string, true> $phpunitHooks
+ */
+function is_allowed_camelcase_method_declaration(
+    string $methodName,
+    bool $underSrc,
+    bool $underTests,
+    ?string $typeName,
+    bool $extendsTestCase,
+    array $scopedMethodAllowlist,
+    array $phpunitHooks
+): bool {
+    if (!$underSrc && !$underTests) {
+        return true;
+    }
+    if ($underSrc && $typeName !== null) {
+        return isset($scopedMethodAllowlist[$typeName . '::' . $methodName]);
+    }
+    if ($underTests) {
+        if (strpos($methodName, 'test') === 0) {
+            return is_snake_case_test_method_name($methodName);
+        }
+        if ($extendsTestCase && isset($phpunitHooks[$methodName])) {
+            return true;
+        }
+        if ($typeName !== null && isset($scopedMethodAllowlist[$typeName . '::' . $methodName])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    return false;
+}
+
 function is_repo_camelcase_identifier(string $name): bool
 {
   if ($name === '' || !ctype_lower($name[0])) {
@@ -65,21 +222,25 @@ function is_repo_camelcase_identifier(string $name): bool
 }
 
 /**
- * @param array<string, true> $methodAllowlist
+ * @param array<string, true> $scopedMethodAllowlist
+ * @param array<string, true> $phpunitHooks
  * @param array<string, list<string>> $parameterAllowlist
  * @return list<string>
  */
 function collect_snake_case_violations(
     string $filePath,
     string $code,
-    array $methodAllowlist,
+    array $scopedMethodAllowlist,
+    array $phpunitHooks,
     array $parameterAllowlist
 ): array {
     $violations = [];
     $tokens = token_get_all($code);
     $expectFunctionName = false;
     $underSrc = strpos($filePath, '/src/') !== false;
-    $className = extract_class_name($code);
+    $underTests = strpos($filePath, '/tests/') !== false;
+    $typeName = extract_type_name($code);
+    $extendsTestCase = $underTests && extends_test_case($code);
     $currentFunction = null;
     /** @var array<string, true> */
     $scopedParameters = [];
@@ -106,11 +267,19 @@ function collect_snake_case_violations(
 
         if ($expectFunctionName && $id === T_STRING) {
             $currentFunction = $text;
-            if ($underSrc && is_repo_camelcase_identifier($text) && !isset($methodAllowlist[$text])) {
+            if (is_repo_camelcase_identifier($text) && !is_allowed_camelcase_method_declaration(
+                $text,
+                $underSrc,
+                $underTests,
+                $typeName,
+                $extendsTestCase,
+                $scopedMethodAllowlist,
+                $phpunitHooks
+            )) {
                 $violations[] = sprintf('%s: repo-owned camelCase identifier %s', $filePath, $text);
             }
-            if ($className !== null) {
-                $scopeKey = $className . '::' . $currentFunction;
+            if ($typeName !== null) {
+                $scopeKey = $typeName . '::' . $currentFunction;
                 $scopedParameters = [];
                 foreach ($parameterAllowlist[$scopeKey] ?? [] as $parameter) {
                     $scopedParameters[$parameter] = true;
@@ -140,11 +309,17 @@ function collect_snake_case_violations(
 }
 
 /**
- * @param array<string, true> $methodAllowlist
+ * @param array<string, true> $scopedMethodAllowlist
+ * @param array<string, true> $phpunitHooks
  * @param array<string, list<string>> $parameterAllowlist
  * @return list<string>
  */
-function collect_snake_case_violations_tree(string $dir, array $methodAllowlist, array $parameterAllowlist): array
+function collect_snake_case_violations_tree(
+    string $dir,
+    array $scopedMethodAllowlist,
+    array $phpunitHooks,
+    array $parameterAllowlist
+): array
 {
     $violations = [];
     $iterator = new RecursiveIteratorIterator(
@@ -160,14 +335,21 @@ function collect_snake_case_violations_tree(string $dir, array $methodAllowlist,
         }
         $violations = array_merge(
             $violations,
-            collect_snake_case_violations($file->getPathname(), $contents, $methodAllowlist, $parameterAllowlist)
+            collect_snake_case_violations(
+                $file->getPathname(),
+                $contents,
+                $scopedMethodAllowlist,
+                $phpunitHooks,
+                $parameterAllowlist
+            )
         );
     }
 
     return $violations;
 }
 
-$methodAllowlist = load_method_allowlist($root . '/scripts/upstream-identifier-allowlist.txt');
+$phpunitHooks = load_phpunit_hook_allowlist($root . '/scripts/upstream-identifier-allowlist.txt');
+$scopedMethodAllowlist = build_scoped_upstream_method_allowlist($root);
 $parameterAllowlist = load_parameter_allowlist($root . '/scripts/upstream-parameter-allowlist.txt');
 
 $scanPaths = [
@@ -399,7 +581,8 @@ if (!is_string($demoUtilsContents) || $demoUtilsContents === $utilsTestContents)
 $demoSnakeViolations = collect_snake_case_violations(
     $utilsTestFile,
     $demoUtilsContents,
-    $methodAllowlist,
+    $scopedMethodAllowlist,
+    $phpunitHooks,
     $parameterAllowlist
 );
 if ($demoSnakeViolations === []) {
@@ -427,7 +610,8 @@ if (!is_string($demoResolverContents) || $demoResolverContents === $uriResolverC
 $demoTargetPathViolations = collect_snake_case_violations(
     $uriResolverFile,
     $demoResolverContents,
-    $methodAllowlist,
+    $scopedMethodAllowlist,
+    $phpunitHooks,
     $parameterAllowlist
 );
 if ($demoTargetPathViolations === []) {
@@ -435,6 +619,59 @@ if ($demoTargetPathViolations === []) {
     exit(1);
 }
 fwrite(STDOUT, "check-legacy-names: contextual targetPath demo failed for injected repo-owned variable.\n");
+
+$multipartFile = $root . '/src/Multipart_Stream.php';
+$multipartContents = file_get_contents($multipartFile);
+if ($multipartContents === false) {
+    fwrite(STDERR, "check-legacy-names: could not read Multipart_Stream.php for method demo.\n");
+    exit(1);
+}
+$demoMultipartContents = str_replace('private function get_headers', 'private function getHeaders', $multipartContents, $count);
+if ($count !== 1) {
+    fwrite(STDERR, "check-legacy-names: Multipart_Stream getHeaders demo could not inject wrong method name.\n");
+    exit(1);
+}
+$demoMultipartViolations = collect_snake_case_violations(
+    $multipartFile,
+    $demoMultipartContents,
+    $scopedMethodAllowlist,
+    $phpunitHooks,
+    $parameterAllowlist
+);
+if ($demoMultipartViolations === []) {
+    fwrite(STDERR, "check-legacy-names: Multipart_Stream getHeaders demo did not fail.\n");
+    exit(1);
+}
+fwrite(STDOUT, "check-legacy-names: scoped method demo failed for injected Multipart_Stream::getHeaders.\n");
+
+$responseTestFile = $root . '/tests/Response_Test.php';
+$responseTestContents = file_get_contents($responseTestFile);
+if ($responseTestContents === false) {
+    fwrite(STDERR, "check-legacy-names: could not read Response_Test.php for testFoo demo.\n");
+    exit(1);
+}
+$demoTestFooContents = preg_replace(
+    '/public function test_default_constructor\(\): void/',
+    'public function testFoo(): void',
+    $responseTestContents,
+    1
+);
+if (!is_string($demoTestFooContents) || $demoTestFooContents === $responseTestContents) {
+    fwrite(STDERR, "check-legacy-names: testFoo demo could not inject wrong test method name.\n");
+    exit(1);
+}
+$demoTestFooViolations = collect_snake_case_violations(
+    $responseTestFile,
+    $demoTestFooContents,
+    $scopedMethodAllowlist,
+    $phpunitHooks,
+    $parameterAllowlist
+);
+if ($demoTestFooViolations === []) {
+    fwrite(STDERR, "check-legacy-names: testFoo demo did not fail.\n");
+    exit(1);
+}
+fwrite(STDOUT, "check-legacy-names: test method demo failed for injected testFoo.\n");
 
 $violations = [];
 foreach ($scanPaths as $path) {
@@ -450,8 +687,8 @@ foreach ($scanPaths as $path) {
 $violations = array_merge($violations, collect_class_file_mismatches([$root . '/src', $root . '/tests']));
 $violations = array_merge(
     $violations,
-    collect_snake_case_violations_tree($root . '/src', $methodAllowlist, $parameterAllowlist),
-    collect_snake_case_violations_tree($root . '/tests', $methodAllowlist, $parameterAllowlist)
+    collect_snake_case_violations_tree($root . '/src', $scopedMethodAllowlist, $phpunitHooks, $parameterAllowlist),
+    collect_snake_case_violations_tree($root . '/tests', $scopedMethodAllowlist, $phpunitHooks, $parameterAllowlist)
 );
 
 fwrite(STDOUT, "check-legacy-names: matcher rejects GuzzleHttp\\Psr7\\HttpFactory.\n");
