@@ -12,7 +12,7 @@ use Psr\Http\Message\StreamInterface;
 
 class Utils_Test extends TestCase
 {
-    public function testCopiesToString(): void
+    public function test_copies_to_string(): void
     {
         $s = Psr7\Utils::stream_for('foobaz');
         self::assertSame('foobaz', Psr7\Utils::copy_to_string($s));
@@ -22,7 +22,7 @@ class Utils_Test extends TestCase
         self::assertSame('', Psr7\Utils::copy_to_string($s));
     }
 
-    public function testCopiesToStringStopsWhenReadFails(): void
+    public function test_copies_to_string_stops_when_read_fails(): void
     {
         $s1 = Psr7\Utils::stream_for('foobaz');
         $s1 = Fn_Stream::decorate($s1, [
@@ -34,7 +34,7 @@ class Utils_Test extends TestCase
         self::assertSame('', $result);
     }
 
-    public function testCopiesToStream(): void
+    public function test_copies_to_stream(): void
     {
         $s1 = Psr7\Utils::stream_for('foobaz');
         $s2 = Psr7\Utils::stream_for('');
@@ -48,7 +48,7 @@ class Utils_Test extends TestCase
         self::assertSame('foobaz', (string) $s2);
     }
 
-    public function testStopsCopyToStreamWhenWriteFails(): void
+    public function test_stops_copy_to_stream_when_write_fails(): void
     {
         $s1 = Psr7\Utils::stream_for('foobaz');
         $s2 = Psr7\Utils::stream_for('');
@@ -61,7 +61,7 @@ class Utils_Test extends TestCase
         self::assertSame('', (string) $s2);
     }
 
-    public function testStopsCopyToSteamWhenWriteFailsWithMaxLen(): void
+    public function test_stops_copy_to_steam_when_write_fails_with_max_len(): void
     {
         $s1 = Psr7\Utils::stream_for('foobaz');
         $s2 = Psr7\Utils::stream_for('');
@@ -74,7 +74,7 @@ class Utils_Test extends TestCase
         self::assertSame('', (string) $s2);
     }
 
-    public function testCopyToStreamReadsInChunksInsteadOfAllInMemory(): void
+    public function test_copy_to_stream_reads_in_chunks_instead_of_all_in_memory(): void
     {
         $sizes = [];
         $s1 = new Fn_Stream([
@@ -96,7 +96,7 @@ class Utils_Test extends TestCase
         self::assertSame(10, $sizes[2]);
     }
 
-    public function testStopsCopyToSteamWhenReadFailsWithMaxLen(): void
+    public function test_stops_copy_to_steam_when_read_fails_with_max_len(): void
     {
         $s1 = Psr7\Utils::stream_for('foobaz');
         $s1 = Fn_Stream::decorate($s1, [
@@ -109,7 +109,7 @@ class Utils_Test extends TestCase
         self::assertSame('', (string) $s2);
     }
 
-    public function testReadsLines(): void
+    public function test_reads_lines(): void
     {
         $s = Psr7\Utils::stream_for("foo\nbaz\nbar");
         self::assertSame("foo\n", Psr7\Utils::read_line($s));
@@ -117,14 +117,14 @@ class Utils_Test extends TestCase
         self::assertSame('bar', Psr7\Utils::read_line($s));
     }
 
-    public function testReadsLinesUpToMaxLength(): void
+    public function test_reads_lines_up_to_max_length(): void
     {
         $s = Psr7\Utils::stream_for("12345\n");
         self::assertSame('123', Psr7\Utils::read_line($s, 4));
         self::assertSame("45\n", Psr7\Utils::read_line($s));
     }
 
-    public function testReadLinesEof(): void
+    public function test_read_lines_eof(): void
     {
         // Should return empty string on EOF
         $s = Psr7\Utils::stream_for("foo\nbar");
@@ -134,7 +134,7 @@ class Utils_Test extends TestCase
         self::assertSame('', Psr7\Utils::read_line($s));
     }
 
-    public function testReadsLineUntilEmptyStringReturnedFromRead(): void
+    public function test_reads_line_until_empty_string_returned_from_read(): void
     {
         $s = $this->createMock(StreamInterface::class);
         $s->expects(self::exactly(2))
@@ -154,22 +154,22 @@ class Utils_Test extends TestCase
         self::assertSame('h', Psr7\Utils::read_line($s));
     }
 
-    public function testRedactUserInfo(): void
+    public function test_redact_user_info(): void
     {
         $uri = new Psr7\Uri('http://my_user:secretPass@localhost/');
 
-        $redactedUri = Psr7\Utils::redact_user_info($uri);
+        $redacted_uri = Psr7\Utils::redact_user_info($uri);
 
-        self::assertSame('http://my_user:***@localhost/', (string) $redactedUri);
+        self::assertSame('http://my_user:***@localhost/', (string) $redacted_uri);
     }
 
-    public function testCalculatesHash(): void
+    public function test_calculates_hash(): void
     {
         $s = Psr7\Utils::stream_for('foobazbar');
         self::assertSame(md5('foobazbar'), Psr7\Utils::hash($s, 'md5'));
     }
 
-    public function testCalculatesHashThrowsWhenSeekFails(): void
+    public function test_calculates_hash_throws_when_seek_fails(): void
     {
         $s = new No_Seek_Stream(Psr7\Utils::stream_for('foobazbar'));
         $s->read(2);
@@ -179,7 +179,7 @@ class Utils_Test extends TestCase
         Psr7\Utils::hash($s, 'md5');
     }
 
-    public function testCalculatesHashSeeksToOriginalPosition(): void
+    public function test_calculates_hash_seeks_to_original_position(): void
     {
         $s = Psr7\Utils::stream_for('foobazbar');
         $s->seek(4);
@@ -187,14 +187,14 @@ class Utils_Test extends TestCase
         self::assertSame(4, $s->tell());
     }
 
-    public function testOpensFilesSuccessfully(): void
+    public function test_opens_files_successfully(): void
     {
         $r = Psr7\Utils::try_fopen(__FILE__, 'r');
         self::assertIsResource($r);
         fclose($r);
     }
 
-    public function testThrowsExceptionNotWarning(): void
+    public function test_throws_exception_not_warning(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Unable to open "/path/to/does/not/exist" using mode "r"');
@@ -202,7 +202,7 @@ class Utils_Test extends TestCase
         Psr7\Utils::try_fopen('/path/to/does/not/exist', 'r');
     }
 
-    public function testThrowsExceptionNotValueError(): void
+    public function test_throws_exception_not_value_error(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Unable to open "" using mode "r"');
@@ -213,7 +213,7 @@ class Utils_Test extends TestCase
     /**
      * @requires PHP 7.4
      */
-    public function testGetsContentsThrowExceptionWhenNotReadable(): void
+    public function test_gets_contents_throw_exception_when_not_readable(): void
     {
         $r = fopen(tempnam(sys_get_temp_dir(), 'guzzle-psr7-'), 'w');
         fwrite($r, 'hello world!');
@@ -228,7 +228,7 @@ class Utils_Test extends TestCase
         }
     }
 
-    public function testGetsContentsThrowExceptionWhenCLosed(): void
+    public function test_gets_contents_throw_exception_when_closed(): void
     {
         $r = fopen(tempnam(sys_get_temp_dir(), 'guzzle-psr7-'), 'r+');
         fclose($r);
@@ -239,7 +239,7 @@ class Utils_Test extends TestCase
         Psr7\Utils::try_get_contents($r);
     }
 
-    public function testCreatesUriForValue(): void
+    public function test_creates_uri_for_value(): void
     {
         self::assertInstanceOf('Guzzle_Http\Psr7\Uri', Psr7\Utils::uri_for('/foo'));
         self::assertInstanceOf(
@@ -248,14 +248,14 @@ class Utils_Test extends TestCase
         );
     }
 
-    public function testValidatesUri(): void
+    public function test_validates_uri(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
         Psr7\Utils::uri_for([]);
     }
 
-    public function testKeepsPositionOfResource(): void
+    public function test_keeps_position_of_resource(): void
     {
         $h = fopen(__FILE__, 'r');
         fseek($h, 10);
@@ -264,7 +264,7 @@ class Utils_Test extends TestCase
         $stream->close();
     }
 
-    public function testCreatesWithFactory(): void
+    public function test_creates_with_factory(): void
     {
         $stream = Psr7\Utils::stream_for('foo');
         self::assertInstanceOf('Guzzle_Http\Psr7\Stream', $stream);
@@ -272,19 +272,19 @@ class Utils_Test extends TestCase
         $stream->close();
     }
 
-    public function testFactoryCreatesFromEmptyString(): void
+    public function test_factory_creates_from_empty_string(): void
     {
         $s = Psr7\Utils::stream_for();
         self::assertInstanceOf('Guzzle_Http\Psr7\Stream', $s);
     }
 
-    public function testFactoryCreatesFromNull(): void
+    public function test_factory_creates_from_null(): void
     {
         $s = Psr7\Utils::stream_for(null);
         self::assertInstanceOf('Guzzle_Http\Psr7\Stream', $s);
     }
 
-    public function testFactoryCreatesFromResource(): void
+    public function test_factory_creates_from_resource(): void
     {
         $r = fopen(__FILE__, 'r');
         $s = Psr7\Utils::stream_for($r);
@@ -292,7 +292,7 @@ class Utils_Test extends TestCase
         self::assertSame(file_get_contents(__FILE__), (string) $s);
     }
 
-    public function testFactoryCreatesFromObjectWithToString(): void
+    public function test_factory_creates_from_object_with_to_string(): void
     {
         $r = new Has_To_String();
         $s = Psr7\Utils::stream_for($r);
@@ -300,33 +300,33 @@ class Utils_Test extends TestCase
         self::assertSame('foo', (string) $s);
     }
 
-    public function testCreatePassesThrough(): void
+    public function test_create_passes_through(): void
     {
         $s = Psr7\Utils::stream_for('foo');
         self::assertSame($s, Psr7\Utils::stream_for($s));
     }
 
-    public function testThrowsExceptionForUnknown(): void
+    public function test_throws_exception_for_unknown(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
         Psr7\Utils::stream_for(new \stdClass());
     }
 
-    public function testReturnsCustomMetadata(): void
+    public function test_returns_custom_metadata(): void
     {
         $s = Psr7\Utils::stream_for('foo', ['metadata' => ['hwm' => 3]]);
         self::assertSame(3, $s->getMetadata('hwm'));
         self::assertArrayHasKey('hwm', $s->getMetadata());
     }
 
-    public function testCanSetSize(): void
+    public function test_can_set_size(): void
     {
         $s = Psr7\Utils::stream_for('', ['size' => 10]);
         self::assertSame(10, $s->getSize());
     }
 
-    public function testCanCreateIteratorBasedStream(): void
+    public function test_can_create_iterator_based_stream(): void
     {
         $a = new \ArrayIterator(['foo', 'bar', '123']);
         $p = Psr7\Utils::stream_for($a);
@@ -342,7 +342,7 @@ class Utils_Test extends TestCase
         self::assertSame(9, $p->tell());
     }
 
-    public function testConvertsRequestsToStrings(): void
+    public function test_converts_requests_to_strings(): void
     {
         $request = new Psr7\Request('PUT', 'http://foo.com/hi?123', [
             'Baz' => 'bar',
@@ -354,7 +354,7 @@ class Utils_Test extends TestCase
         );
     }
 
-    public function testConvertsResponsesToStrings(): void
+    public function test_converts_responses_to_strings(): void
     {
         $response = new Psr7\Response(200, [
             'Baz' => 'bar',
@@ -366,7 +366,7 @@ class Utils_Test extends TestCase
         );
     }
 
-    public function testCorrectlyRendersSetCookieHeadersToString(): void
+    public function test_correctly_renders_set_cookie_headers_to_string(): void
     {
         $response = new Psr7\Response(200, [
             'Set-Cookie' => ['bar', 'baz', 'qux'],
@@ -377,7 +377,7 @@ class Utils_Test extends TestCase
         );
     }
 
-    public function testCanModifyRequestWithUri(): void
+    public function test_can_modify_request_with_uri(): void
     {
         $r1 = new Psr7\Request('GET', 'http://foo.com');
         $r2 = Psr7\Utils::modify_request($r1, [
@@ -387,7 +387,7 @@ class Utils_Test extends TestCase
         self::assertSame('www.foo.com', (string) $r2->getHeaderLine('host'));
     }
 
-    public function testCanModifyRequestWithUriAndPort(): void
+    public function test_can_modify_request_with_uri_and_port(): void
     {
         $r1 = new Psr7\Request('GET', 'http://foo.com:8000');
         $r2 = Psr7\Utils::modify_request($r1, [
@@ -397,7 +397,7 @@ class Utils_Test extends TestCase
         self::assertSame('www.foo.com:8000', (string) $r2->getHeaderLine('host'));
     }
 
-    public function testCanModifyRequestWithCaseInsensitiveHeader(): void
+    public function test_can_modify_request_with_case_insensitive_header(): void
     {
         $r1 = new Psr7\Request('GET', 'http://foo.com', ['User-Agent' => 'foo']);
         $r2 = Psr7\Utils::modify_request($r1, ['set_headers' => ['User-agent' => 'bar']]);
@@ -405,7 +405,7 @@ class Utils_Test extends TestCase
         self::assertSame('bar', $r2->getHeaderLine('User-agent'));
     }
 
-    public function testReturnsAsIsWhenNoChanges(): void
+    public function test_returns_as_is_when_no_changes(): void
     {
         $r1 = new Psr7\Request('GET', 'http://foo.com');
         $r2 = Psr7\Utils::modify_request($r1, []);
@@ -416,7 +416,7 @@ class Utils_Test extends TestCase
         self::assertInstanceOf('Psr\Http\Message\ServerRequestInterface', $r2);
     }
 
-    public function testReturnsUriAsIsWhenNoChanges(): void
+    public function test_returns_uri_as_is_when_no_changes(): void
     {
         $r1 = new Psr7\Request('GET', 'http://foo.com');
         $r2 = Psr7\Utils::modify_request($r1, ['set_headers' => ['foo' => 'bar']]);
@@ -424,7 +424,7 @@ class Utils_Test extends TestCase
         self::assertSame('bar', $r2->getHeaderLine('foo'));
     }
 
-    public function testRemovesHeadersFromMessage(): void
+    public function test_removes_headers_from_message(): void
     {
         $r1 = new Psr7\Request('GET', 'http://foo.com', ['foo' => 'bar']);
         $r2 = Psr7\Utils::modify_request($r1, ['remove_headers' => ['foo']]);
@@ -432,7 +432,7 @@ class Utils_Test extends TestCase
         self::assertFalse($r2->hasHeader('foo'));
     }
 
-    public function testAddsQueryToUri(): void
+    public function test_adds_query_to_uri(): void
     {
         $r1 = new Psr7\Request('GET', 'http://foo.com');
         $r2 = Psr7\Utils::modify_request($r1, ['query' => 'foo=bar']);
@@ -440,7 +440,7 @@ class Utils_Test extends TestCase
         self::assertSame('foo=bar', $r2->getUri()->getQuery());
     }
 
-    public function testModifyRequestKeepInstanceOfRequest(): void
+    public function test_modify_request_keep_instance_of_request(): void
     {
         $r1 = new Psr7\Request('GET', 'http://foo.com');
         $r2 = Psr7\Utils::modify_request($r1, ['remove_headers' => ['non-existent']]);
@@ -451,69 +451,69 @@ class Utils_Test extends TestCase
         self::assertInstanceOf('Psr\Http\Message\ServerRequestInterface', $r2);
     }
 
-    public function testModifyServerRequestWithUploadedFiles(): void
+    public function test_modify_server_request_with_uploaded_files(): void
     {
         $request = new Psr7\Server_Request('GET', 'http://example.com/bla');
         $file = new Psr7\Uploaded_File('Test', 100, \UPLOAD_ERR_OK);
         $request = $request->withUploadedFiles([$file]);
 
         /** @var Psr7\Server_Request $modifiedRequest */
-        $modifiedRequest = Psr7\Utils::modify_request($request, ['set_headers' => ['foo' => 'bar']]);
+        $modified_request = Psr7\Utils::modify_request($request, ['set_headers' => ['foo' => 'bar']]);
 
-        self::assertCount(1, $modifiedRequest->getUploadedFiles());
+        self::assertCount(1, $modified_request->getUploadedFiles());
 
-        $files = $modifiedRequest->getUploadedFiles();
+        $files = $modified_request->getUploadedFiles();
         self::assertInstanceOf('Guzzle_Http\Psr7\Uploaded_File', $files[0]);
     }
 
-    public function testModifyServerRequestWithCookies(): void
+    public function test_modify_server_request_with_cookies(): void
     {
         $request = (new Psr7\Server_Request('GET', 'http://example.com/bla'))
             ->withCookieParams(['name' => 'value']);
 
         /** @var Psr7\Server_Request $modifiedRequest */
-        $modifiedRequest = Psr7\Utils::modify_request($request, ['set_headers' => ['foo' => 'bar']]);
+        $modified_request = Psr7\Utils::modify_request($request, ['set_headers' => ['foo' => 'bar']]);
 
-        self::assertSame(['name' => 'value'], $modifiedRequest->getCookieParams());
+        self::assertSame(['name' => 'value'], $modified_request->getCookieParams());
     }
 
-    public function testModifyServerRequestParsedBody(): void
+    public function test_modify_server_request_parsed_body(): void
     {
         $request = (new Psr7\Server_Request('GET', 'http://example.com/bla'))
             ->withParsedBody(['name' => 'value']);
 
         /** @var Psr7\Server_Request $modifiedRequest */
-        $modifiedRequest = Psr7\Utils::modify_request($request, ['set_headers' => ['foo' => 'bar']]);
+        $modified_request = Psr7\Utils::modify_request($request, ['set_headers' => ['foo' => 'bar']]);
 
-        self::assertSame(['name' => 'value'], $modifiedRequest->getParsedBody());
+        self::assertSame(['name' => 'value'], $modified_request->getParsedBody());
     }
 
-    public function testModifyServerRequestQueryParams(): void
+    public function test_modify_server_request_query_params(): void
     {
         $request = (new Psr7\Server_Request('GET', 'http://example.com/bla'))
             ->withQueryParams(['name' => 'value']);
 
         /** @var Psr7\Server_Request $modifiedRequest */
-        $modifiedRequest = Psr7\Utils::modify_request($request, ['set_headers' => ['foo' => 'bar']]);
+        $modified_request = Psr7\Utils::modify_request($request, ['set_headers' => ['foo' => 'bar']]);
 
-        self::assertSame(['name' => 'value'], $modifiedRequest->getQueryParams());
+        self::assertSame(['name' => 'value'], $modified_request->getQueryParams());
     }
 
-    public function testModifyServerRequestRetainsAttributes(): void
+    public function test_modify_server_request_retains_attributes(): void
     {
         $request = (new Psr7\Server_Request('GET', 'http://example.com/bla'))
             ->withAttribute('foo', 'bar');
 
         /** @var Psr7\Server_Request $modifiedRequest */
-        $modifiedRequest = Psr7\Utils::modify_request($request, []);
+        $modified_request = Psr7\Utils::modify_request($request, []);
 
-        self::assertSame(['foo' => 'bar'], $modifiedRequest->getAttributes());
+        self::assertSame(['foo' => 'bar'], $modified_request->getAttributes());
     }
 
     /**
      * @return list<array{0: string[], 1: array, 2: array}>
      */
-    public static function providesCaselessRemoveCases(): array
+    public static function provides_caseless_remove_cases(): array
     {
         return [
             [
@@ -540,11 +540,11 @@ class Utils_Test extends TestCase
     }
 
     /**
-     * @dataProvider providesCaselessRemoveCases
+     * @dataProvider provides_caseless_remove_cases
      *
      * @param string[] $keys
      */
-    public function testCaselessRemove(array $keys, array $data, array $expected): void
+    public function test_caseless_remove(array $keys, array $data, array $expected): void
     {
         self::assertSame($expected, Psr7\Utils::caseless_remove($keys, $data));
     }

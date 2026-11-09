@@ -10,18 +10,18 @@ class Server_Request_From_Globals_Test extends TestCase
 {
     protected function setUp(): void
     {
-        if (false === $this->getServerUri()) {
+        if (false === $this->get_server_uri()) {
             self::markTestSkipped();
         }
 
         parent::setUp();
     }
 
-    public function testBodyExists(): void
+    public function test_body_exists(): void
     {
         $curl = curl_init();
 
-        curl_setopt($curl, CURLOPT_URL, $this->getServerUri());
+        curl_setopt($curl, CURLOPT_URL, $this->get_server_uri());
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, 'foobar');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -41,7 +41,7 @@ class Server_Request_From_Globals_Test extends TestCase
         self::assertEquals('foobar', $data['body']);
     }
 
-    private function getServerUri()
+    private function get_server_uri()
     {
         return $_SERVER['TEST_SERVER'] ?? false;
     }

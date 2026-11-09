@@ -87,17 +87,17 @@ final class Header
             }
 
             $v = '';
-            $isQuoted = false;
-            $isEscaped = false;
+            $is_quoted = false;
+            $is_escaped = false;
             for ($i = 0, $max = \strlen($value); $i < $max; ++$i) {
-                if ($isEscaped) {
+                if ($is_escaped) {
                     $v .= $value[$i];
-                    $isEscaped = false;
+                    $is_escaped = false;
 
                     continue;
                 }
 
-                if (!$isQuoted && $value[$i] === ',') {
+                if (!$is_quoted && $value[$i] === ',') {
                     $v = \trim($v);
                     if ($v !== '') {
                         $result[] = $v;
@@ -107,14 +107,14 @@ final class Header
                     continue;
                 }
 
-                if ($isQuoted && $value[$i] === '\\') {
-                    $isEscaped = true;
+                if ($is_quoted && $value[$i] === '\\') {
+                    $is_escaped = true;
                     $v .= $value[$i];
 
                     continue;
                 }
                 if ($value[$i] === '"') {
-                    $isQuoted = !$isQuoted;
+                    $is_quoted = !$is_quoted;
                     $v .= $value[$i];
 
                     continue;

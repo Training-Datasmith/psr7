@@ -114,7 +114,7 @@ class Uri implements UriInterface, \JsonSerializable
         }
 
         /** @var string */
-        $encodedUrl = preg_replace_callback(
+        $encoded_url = preg_replace_callback(
             '%[^:/@?&=#]+%usD',
             static function ($matches) {
                 return urlencode($matches[0]);
@@ -122,7 +122,7 @@ class Uri implements UriInterface, \JsonSerializable
             $url
         );
 
-        $result = parse_url($prefix.$encodedUrl);
+        $result = parse_url($prefix.$encoded_url);
 
         if ($result === false) {
             return false;
@@ -339,11 +339,11 @@ class Uri implements UriInterface, \JsonSerializable
      * @param UriInterface    $uri           URI to use as a base.
      * @param (string|null)[] $keyValueArray Associative array of key and values
      */
-    public static function with_query_values(UriInterface $uri, array $keyValueArray): UriInterface
+    public static function with_query_values(UriInterface $uri, array $key_value_array): UriInterface
     {
-        $result = self::get_filtered_query_string($uri, array_keys($keyValueArray));
+        $result = self::get_filtered_query_string($uri, array_keys($key_value_array));
 
-        foreach ($keyValueArray as $key => $value) {
+        foreach ($key_value_array as $key => $value) {
             $result[] = self::generate_query_string((string) $key, $value !== null ? (string) $value : null);
         }
 
@@ -650,12 +650,12 @@ class Uri implements UriInterface, \JsonSerializable
             return [];
         }
 
-        $decodedKeys = array_map(function ($k): string {
+        $decoded_keys = array_map(function ($k): string {
             return rawurldecode((string) $k);
         }, $keys);
 
-        return array_filter(explode('&', $current), function ($part) use ($decodedKeys) {
-            return !in_array(rawurldecode(explode('=', $part)[0]), $decodedKeys, true);
+        return array_filter(explode('&', $current), function ($part) use ($decoded_keys) {
+            return !in_array(rawurldecode(explode('=', $part)[0]), $decoded_keys, true);
         });
     }
 
@@ -665,13 +665,13 @@ class Uri implements UriInterface, \JsonSerializable
         // key or value need to be encoded
         // (while preventing double-encoding) before setting the query string. All other
         // chars that need percent-encoding will be encoded by withQuery().
-        $queryString = strtr($key, self::QUERY_SEPARATORS_REPLACEMENT);
+        $query_string = strtr($key, self::QUERY_SEPARATORS_REPLACEMENT);
 
         if ($value !== null) {
-            $queryString .= '='.strtr($value, self::QUERY_SEPARATORS_REPLACEMENT);
+            $query_string .= '='.strtr($value, self::QUERY_SEPARATORS_REPLACEMENT);
         }
 
-        return $queryString;
+        return $query_string;
     }
 
     private function remove_default_port(): void

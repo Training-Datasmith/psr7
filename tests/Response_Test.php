@@ -15,7 +15,7 @@ use Psr\Http\Message\StreamInterface;
  */
 class Response_Test extends TestCase
 {
-    public function testDefaultConstructor(): void
+    public function test_default_constructor(): void
     {
         $r = new Response();
         self::assertSame(200, $r->getStatusCode());
@@ -26,30 +26,30 @@ class Response_Test extends TestCase
         self::assertSame('', (string) $r->getBody());
     }
 
-    public function testCanConstructWithStatusCode(): void
+    public function test_can_construct_with_status_code(): void
     {
         $r = new Response(404);
         self::assertSame(404, $r->getStatusCode());
         self::assertSame('Not Found', $r->getReasonPhrase());
     }
 
-    public function testConstructorDoesNotReadStreamBody(): void
+    public function test_constructor_does_not_read_stream_body(): void
     {
-        $streamIsRead = false;
+        $stream_is_read = false;
         $body = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for(''), [
-            '__toString' => function () use (&$streamIsRead) {
-                $streamIsRead = true;
+            '__toString' => function () use (&$stream_is_read) {
+                $stream_is_read = true;
 
                 return '';
             },
         ]);
 
         $r = new Response(200, [], $body);
-        self::assertFalse($streamIsRead);
+        self::assertFalse($stream_is_read);
         self::assertSame($body, $r->getBody());
     }
 
-    public function testStatusCanBeNumericString(): void
+    public function test_status_can_be_numeric_string(): void
     {
         $r = (new Response())->withStatus('201');
 
@@ -57,7 +57,7 @@ class Response_Test extends TestCase
         self::assertSame('Created', $r->getReasonPhrase());
     }
 
-    public function testCanConstructWithHeaders(): void
+    public function test_can_construct_with_headers(): void
     {
         $r = new Response(200, ['Foo' => 'Bar']);
         self::assertSame(['Foo' => ['Bar']], $r->getHeaders());
@@ -65,7 +65,7 @@ class Response_Test extends TestCase
         self::assertSame(['Bar'], $r->getHeader('Foo'));
     }
 
-    public function testCanConstructWithHeadersAsArray(): void
+    public function test_can_construct_with_headers_as_array(): void
     {
         $r = new Response(200, [
             'Foo' => ['baz', 'bar'],
@@ -75,28 +75,28 @@ class Response_Test extends TestCase
         self::assertSame(['baz', 'bar'], $r->getHeader('Foo'));
     }
 
-    public function testCanConstructWithBody(): void
+    public function test_can_construct_with_body(): void
     {
         $r = new Response(200, [], 'baz');
         self::assertInstanceOf(StreamInterface::class, $r->getBody());
         self::assertSame('baz', (string) $r->getBody());
     }
 
-    public function testNullBody(): void
+    public function test_null_body(): void
     {
         $r = new Response(200, [], null);
         self::assertInstanceOf(StreamInterface::class, $r->getBody());
         self::assertSame('', (string) $r->getBody());
     }
 
-    public function testFalseyBody(): void
+    public function test_falsey_body(): void
     {
         $r = new Response(200, [], '0');
         self::assertInstanceOf(StreamInterface::class, $r->getBody());
         self::assertSame('0', (string) $r->getBody());
     }
 
-    public function testCanConstructWithReason(): void
+    public function test_can_construct_with_reason(): void
     {
         $r = new Response(200, [], null, '1.1', 'bar');
         self::assertSame('bar', $r->getReasonPhrase());
@@ -105,20 +105,20 @@ class Response_Test extends TestCase
         self::assertSame('0', $r->getReasonPhrase(), 'Falsey reason works');
     }
 
-    public function testCanConstructWithProtocolVersion(): void
+    public function test_can_construct_with_protocol_version(): void
     {
         $r = new Response(200, [], null, '1000');
         self::assertSame('1000', $r->getProtocolVersion());
     }
 
-    public function testWithStatusCodeAndNoReason(): void
+    public function test_with_status_code_and_no_reason(): void
     {
         $r = (new Response())->withStatus(201);
         self::assertSame(201, $r->getStatusCode());
         self::assertSame('Created', $r->getReasonPhrase());
     }
 
-    public function testWithStatusCodeAndReason(): void
+    public function test_with_status_code_and_reason(): void
     {
         $r = (new Response())->withStatus(201, 'Foo');
         self::assertSame(201, $r->getStatusCode());
@@ -129,19 +129,19 @@ class Response_Test extends TestCase
         self::assertSame('0', $r->getReasonPhrase(), 'Falsey reason works');
     }
 
-    public function testWithProtocolVersion(): void
+    public function test_with_protocol_version(): void
     {
         $r = (new Response())->withProtocolVersion('1000');
         self::assertSame('1000', $r->getProtocolVersion());
     }
 
-    public function testSameInstanceWhenSameProtocol(): void
+    public function test_same_instance_when_same_protocol(): void
     {
         $r = new Response();
         self::assertSame($r, $r->withProtocolVersion('1.1'));
     }
 
-    public function testWithBody(): void
+    public function test_with_body(): void
     {
         $b = Psr7\Utils::stream_for('0');
         $r = (new Response())->withBody($b);
@@ -149,14 +149,14 @@ class Response_Test extends TestCase
         self::assertSame('0', (string) $r->getBody());
     }
 
-    public function testSameInstanceWhenSameBody(): void
+    public function test_same_instance_when_same_body(): void
     {
         $r = new Response();
         $b = $r->getBody();
         self::assertSame($r, $r->withBody($b));
     }
 
-    public function testWithHeader(): void
+    public function test_with_header(): void
     {
         $r = new Response(200, ['Foo' => 'Bar']);
         $r2 = $r->withHeader('baZ', 'Bam');
@@ -166,13 +166,13 @@ class Response_Test extends TestCase
         self::assertSame(['Bam'], $r2->getHeader('baz'));
     }
 
-    public function testNumericHeaderValue(): void
+    public function test_numeric_header_value(): void
     {
         $r = (new Response())->withHeader('Api-Version', 1);
         self::assertSame(['Api-Version' => ['1']], $r->getHeaders());
     }
 
-    public function testWithHeaderAsArray(): void
+    public function test_with_header_as_array(): void
     {
         $r = new Response(200, ['Foo' => 'Bar']);
         $r2 = $r->withHeader('baZ', ['Bam', 'Bar']);
@@ -182,7 +182,7 @@ class Response_Test extends TestCase
         self::assertSame(['Bam', 'Bar'], $r2->getHeader('baz'));
     }
 
-    public function testWithHeaderReplacesDifferentCase(): void
+    public function test_with_header_replaces_different_case(): void
     {
         $r = new Response(200, ['Foo' => 'Bar']);
         $r2 = $r->withHeader('foO', 'Bam');
@@ -192,7 +192,7 @@ class Response_Test extends TestCase
         self::assertSame(['Bam'], $r2->getHeader('foo'));
     }
 
-    public function testWithAddedHeader(): void
+    public function test_with_added_header(): void
     {
         $r = new Response(200, ['Foo' => 'Bar']);
         $r2 = $r->withAddedHeader('foO', 'Baz');
@@ -202,7 +202,7 @@ class Response_Test extends TestCase
         self::assertSame(['Bar', 'Baz'], $r2->getHeader('foo'));
     }
 
-    public function testWithAddedHeaderAsArray(): void
+    public function test_with_added_header_as_array(): void
     {
         $r = new Response(200, ['Foo' => 'Bar']);
         $r2 = $r->withAddedHeader('foO', ['Baz', 'Bam']);
@@ -212,7 +212,7 @@ class Response_Test extends TestCase
         self::assertSame(['Bar', 'Baz', 'Bam'], $r2->getHeader('foo'));
     }
 
-    public function testWithAddedHeaderThatDoesNotExist(): void
+    public function test_with_added_header_that_does_not_exist(): void
     {
         $r = new Response(200, ['Foo' => 'Bar']);
         $r2 = $r->withAddedHeader('nEw', 'Baz');
@@ -222,7 +222,7 @@ class Response_Test extends TestCase
         self::assertSame(['Baz'], $r2->getHeader('new'));
     }
 
-    public function testWithoutHeaderThatExists(): void
+    public function test_without_header_that_exists(): void
     {
         $r = new Response(200, ['Foo' => 'Bar', 'Baz' => 'Bam']);
         $r2 = $r->withoutHeader('foO');
@@ -232,7 +232,7 @@ class Response_Test extends TestCase
         self::assertSame(['Baz' => ['Bam']], $r2->getHeaders());
     }
 
-    public function testWithoutHeaderThatDoesNotExist(): void
+    public function test_without_header_that_does_not_exist(): void
     {
         $r = new Response(200, ['Baz' => 'Bam']);
         $r2 = $r->withoutHeader('foO');
@@ -241,19 +241,19 @@ class Response_Test extends TestCase
         self::assertSame(['Baz' => ['Bam']], $r2->getHeaders());
     }
 
-    public function testSameInstanceWhenRemovingMissingHeader(): void
+    public function test_same_instance_when_removing_missing_header(): void
     {
         $r = new Response();
         self::assertSame($r, $r->withoutHeader('foo'));
     }
 
-    public function testPassNumericHeaderNameInConstructor(): void
+    public function test_pass_numeric_header_name_in_constructor(): void
     {
         $r = new Response(200, ['Location' => 'foo', '123' => 'bar']);
         self::assertSame('bar', $r->getHeaderLine('123'));
     }
 
-    public function testConstructResponseEmptyListHeaderValue(): void
+    public function test_construct_response_empty_list_header_value(): void
     {
         $r = new Response(200, ['Foo' => []]);
         self::assertSame('', $r->getHeaderLine('Foo'));
@@ -262,16 +262,16 @@ class Response_Test extends TestCase
     }
 
     /**
-     * @dataProvider invalidHeaderProvider
+     * @dataProvider invalid_header_provider
      */
-    public function testConstructResponseInvalidHeader($header, $headerValue, $expectedMessage): void
+    public function test_construct_response_invalid_header($header, $header_value, $expected_message): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage($expectedMessage);
-        new Response(200, [$header => $headerValue]);
+        $this->expectExceptionMessage($expected_message);
+        new Response(200, [$header => $header_value]);
     }
 
-    public static function invalidHeaderProvider(): iterable
+    public static function invalid_header_provider(): iterable
     {
         return [
             ['', '', '"" is not valid header name'],
@@ -280,19 +280,19 @@ class Response_Test extends TestCase
     }
 
     /**
-     * @dataProvider invalidWithHeaderProvider
+     * @dataProvider invalid_with_header_provider
      */
-    public function testWithInvalidHeader($header, $headerValue, $expectedMessage): void
+    public function test_with_invalid_header($header, $header_value, $expected_message): void
     {
         $r = new Response();
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage($expectedMessage);
-        $r->withHeader($header, $headerValue);
+        $this->expectExceptionMessage($expected_message);
+        $r->withHeader($header, $header_value);
     }
 
-    public static function invalidWithHeaderProvider(): iterable
+    public static function invalid_with_header_provider(): iterable
     {
-        yield from self::invalidHeaderProvider();
+        yield from self::invalid_header_provider();
         yield [[], 'foo', 'Header name must be a string but array provided.'];
         yield [false, 'foo', 'Header name must be a string but boolean provided.'];
         yield [new \stdClass(), 'foo', 'Header name must be a string but stdClass provided.'];
@@ -307,7 +307,7 @@ class Response_Test extends TestCase
         yield ["\t", 'foo', "\"\t\" is not valid header name."];
     }
 
-    public function testHeaderValuesAreTrimmed(): void
+    public function test_header_values_are_trimmed(): void
     {
         $r1 = new Response(200, ['OWS' => " \t \tFoo\t \t "]);
         $r2 = (new Response())->withHeader('OWS', " \t \tFoo\t \t ");
@@ -320,40 +320,40 @@ class Response_Test extends TestCase
         }
     }
 
-    public function testWithAddedHeaderArrayValueAndKeys(): void
+    public function test_with_added_header_array_value_and_keys(): void
     {
         $message = (new Response())->withAddedHeader('list', ['foo' => 'one']);
         $message = $message->withAddedHeader('list', ['foo' => 'two', 'bar' => 'three']);
 
-        $headerLine = $message->getHeaderLine('list');
-        self::assertSame('one, two, three', $headerLine);
+        $header_line = $message->getHeaderLine('list');
+        self::assertSame('one, two, three', $header_line);
     }
 
     /**
-     * @dataProvider nonIntegerStatusCodeProvider
+     * @dataProvider non_integer_status_code_provider
      *
      * @param mixed $invalidValues
      */
-    public function testConstructResponseWithNonIntegerStatusCode($invalidValues): void
+    public function test_construct_response_with_non_integer_status_code($invalid_values): void
     {
         $this->expectException(\TypeError::class);
-        new Response($invalidValues);
+        new Response($invalid_values);
     }
 
     /**
-     * @dataProvider nonIntegerStatusCodeProvider
+     * @dataProvider non_integer_status_code_provider
      *
      * @param mixed $invalidValues
      */
-    public function testResponseChangeStatusCodeWithNonInteger($invalidValues): void
+    public function test_response_change_status_code_with_non_integer($invalid_values): void
     {
         $response = new Response();
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Status code must be an integer value.');
-        $response->withStatus($invalidValues);
+        $response->withStatus($invalid_values);
     }
 
-    public static function nonIntegerStatusCodeProvider(): iterable
+    public static function non_integer_status_code_provider(): iterable
     {
         return [
             ['whatever'],
@@ -364,31 +364,31 @@ class Response_Test extends TestCase
     }
 
     /**
-     * @dataProvider invalidStatusCodeRangeProvider
+     * @dataProvider invalid_status_code_range_provider
      *
      * @param mixed $invalidValues
      */
-    public function testConstructResponseWithInvalidRangeStatusCode($invalidValues): void
+    public function test_construct_response_with_invalid_range_status_code($invalid_values): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Status code must be an integer value between 1xx and 5xx.');
-        new Response($invalidValues);
+        new Response($invalid_values);
     }
 
     /**
-     * @dataProvider invalidStatusCodeRangeProvider
+     * @dataProvider invalid_status_code_range_provider
      *
      * @param mixed $invalidValues
      */
-    public function testResponseChangeStatusCodeWithWithInvalidRange($invalidValues): void
+    public function test_response_change_status_code_with_with_invalid_range($invalid_values): void
     {
         $response = new Response();
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Status code must be an integer value between 1xx and 5xx.');
-        $response->withStatus($invalidValues);
+        $response->withStatus($invalid_values);
     }
 
-    public static function invalidStatusCodeRangeProvider(): iterable
+    public static function invalid_status_code_range_provider(): iterable
     {
         return [
             [600],

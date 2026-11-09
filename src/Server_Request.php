@@ -139,7 +139,7 @@ class Server_Request extends Request implements ServerRequestInterface
      */
     private static function normalize_nested_file_spec(array $files = []): array
     {
-        $normalizedFiles = [];
+        $normalized_files = [];
 
         foreach (array_keys($files['tmp_name']) as $key) {
             $spec = [
@@ -149,10 +149,10 @@ class Server_Request extends Request implements ServerRequestInterface
                 'name' => $files['name'][$key] ?? null,
                 'type' => $files['type'][$key] ?? null,
             ];
-            $normalizedFiles[$key] = self::create_uploaded_file_from_spec($spec);
+            $normalized_files[$key] = self::create_uploaded_file_from_spec($spec);
         }
 
-        return $normalizedFiles;
+        return $normalized_files;
     }
 
     /**
@@ -171,9 +171,9 @@ class Server_Request extends Request implements ServerRequestInterface
         $body = new Caching_Stream(new Lazy_Open_Stream('php://input', 'r+'));
         $protocol = isset($_SERVER['SERVER_PROTOCOL']) ? str_replace('HTTP/', '', $_SERVER['SERVER_PROTOCOL']) : '1.1';
 
-        $serverRequest = new Server_Request($method, $uri, $headers, $body, $protocol, $_SERVER);
+        $server_request = new Server_Request($method, $uri, $headers, $body, $protocol, $_SERVER);
 
-        return $serverRequest
+        return $server_request
             ->withCookieParams($_COOKIE)
             ->withQueryParams($_GET)
             ->withParsedBody($_POST)
@@ -203,7 +203,7 @@ class Server_Request extends Request implements ServerRequestInterface
 
         $uri = $uri->withScheme(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http');
 
-        $hasPort = false;
+        $has_port = false;
         if (isset($_SERVER['HTTP_HOST'])) {
             [$host, $port] = self::extract_host_and_port_from_authority($_SERVER['HTTP_HOST']);
             if ($host !== null) {
@@ -211,7 +211,7 @@ class Server_Request extends Request implements ServerRequestInterface
             }
 
             if ($port !== null) {
-                $hasPort = true;
+                $has_port = true;
                 $uri = $uri->withPort($port);
             }
         } elseif (isset($_SERVER['SERVER_NAME'])) {
@@ -220,21 +220,21 @@ class Server_Request extends Request implements ServerRequestInterface
             $uri = $uri->withHost($_SERVER['SERVER_ADDR']);
         }
 
-        if (!$hasPort && isset($_SERVER['SERVER_PORT'])) {
+        if (!$has_port && isset($_SERVER['SERVER_PORT'])) {
             $uri = $uri->withPort($_SERVER['SERVER_PORT']);
         }
 
-        $hasQuery = false;
+        $has_query = false;
         if (isset($_SERVER['REQUEST_URI'])) {
-            $requestUriParts = explode('?', $_SERVER['REQUEST_URI'], 2);
-            $uri = $uri->withPath($requestUriParts[0]);
-            if (isset($requestUriParts[1])) {
-                $hasQuery = true;
-                $uri = $uri->withQuery($requestUriParts[1]);
+            $request_uri_parts = explode('?', $_SERVER['REQUEST_URI'], 2);
+            $uri = $uri->withPath($request_uri_parts[0]);
+            if (isset($request_uri_parts[1])) {
+                $has_query = true;
+                $uri = $uri->withQuery($request_uri_parts[1]);
             }
         }
 
-        if (!$hasQuery && isset($_SERVER['QUERY_STRING'])) {
+        if (!$has_query && isset($_SERVER['QUERY_STRING'])) {
             $uri = $uri->withQuery($_SERVER['QUERY_STRING']);
         }
 

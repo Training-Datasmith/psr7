@@ -190,12 +190,12 @@ final class Append_Stream implements StreamInterface
         $buffer = '';
         $total = count($this->streams) - 1;
         $remaining = $length;
-        $progressToNext = false;
+        $progress_to_next = false;
 
         while ($remaining > 0) {
             // Progress to the next stream if needed.
-            if ($progressToNext || $this->streams[$this->current]->eof()) {
-                $progressToNext = false;
+            if ($progress_to_next || $this->streams[$this->current]->eof()) {
+                $progress_to_next = false;
                 if ($this->current === $total) {
                     break;
                 }
@@ -205,7 +205,7 @@ final class Append_Stream implements StreamInterface
             $result = $this->streams[$this->current]->read($remaining);
 
             if ($result === '') {
-                $progressToNext = true;
+                $progress_to_next = true;
                 continue;
             }
 

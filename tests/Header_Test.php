@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class Header_Test extends TestCase
 {
-    public static function parseParamsProvider(): array
+    public static function parse_params_provider(): array
     {
         $res1 = [
             [
@@ -57,14 +57,14 @@ class Header_Test extends TestCase
     }
 
     /**
-     * @dataProvider parseParamsProvider
+     * @dataProvider parse_params_provider
      */
-    public function testParseParams($header, $result): void
+    public function test_parse_params($header, $result): void
     {
         self::assertSame($result, Psr7\Header::parse($header));
     }
 
-    public static function normalizeProvider(): array
+    public static function normalize_provider(): array
     {
         return [
             [
@@ -143,37 +143,37 @@ class Header_Test extends TestCase
     }
 
     /**
-     * @dataProvider normalizeProvider
+     * @dataProvider normalize_provider
      */
-    public function testNormalize($header, $result): void
+    public function test_normalize($header, $result): void
     {
         self::assertSame($result, Psr7\Header::normalize([$header]));
         self::assertSame($result, Psr7\Header::normalize($header));
     }
 
     /**
-     * @dataProvider normalizeProvider
+     * @dataProvider normalize_provider
      */
-    public function testSplitList($header, $result): void
+    public function test_split_list($header, $result): void
     {
         self::assertSame($result, Psr7\Header::split_list($header));
     }
 
-    public function testSplitListRejectsNestedArrays(): void
+    public function test_split_list_rejects_nested_arrays(): void
     {
         $this->expectException(\TypeError::class);
 
         Psr7\Header::split_list([['foo']]);
     }
 
-    public function testSplitListArrayContainingNonStrings(): void
+    public function test_split_list_array_containing_non_strings(): void
     {
         $this->expectException(\TypeError::class);
 
         Psr7\Header::split_list(['foo', 'bar', 1, false]);
     }
 
-    public function testSplitListRejectsNonStrings(): void
+    public function test_split_list_rejects_non_strings(): void
     {
         $this->expectException(\TypeError::class);
 

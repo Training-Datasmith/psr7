@@ -14,7 +14,7 @@ use Psr\Http\Message\StreamInterface;
  */
 class No_Seek_Stream_Test extends TestCase
 {
-    public function testCannotSeek(): void
+    public function test_cannot_seek(): void
     {
         $s = $this->createMock(StreamInterface::class);
         $s->expects(self::never())->method('seek');
@@ -26,7 +26,7 @@ class No_Seek_Stream_Test extends TestCase
         $wrapped->seek(2);
     }
 
-    public function testToStringDoesNotSeek(): void
+    public function test_to_string_does_not_seek(): void
     {
         $s = \Guzzle_Http\Psr7\Utils::stream_for('foo');
         $s->seek(1);

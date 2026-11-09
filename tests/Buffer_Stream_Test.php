@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class Buffer_Stream_Test extends TestCase
 {
-    public function testHasMetadata(): void
+    public function test_has_metadata(): void
     {
         $b = new Buffer_Stream(10);
         self::assertTrue($b->isReadable());
@@ -20,7 +20,7 @@ class Buffer_Stream_Test extends TestCase
         self::assertSame([], $b->getMetadata());
     }
 
-    public function testRemovesReadDataFromBuffer(): void
+    public function test_removes_read_data_from_buffer(): void
     {
         $b = new Buffer_Stream();
         self::assertSame(3, $b->write('foo'));
@@ -31,7 +31,7 @@ class Buffer_Stream_Test extends TestCase
         self::assertSame('', $b->read(10));
     }
 
-    public function testCanCastToStringOrGetContents(): void
+    public function test_can_cast_to_string_or_get_contents(): void
     {
         $b = new Buffer_Stream();
         $b->write('foo');
@@ -44,7 +44,7 @@ class Buffer_Stream_Test extends TestCase
         $b->tell();
     }
 
-    public function testDetachClearsBuffer(): void
+    public function test_detach_clears_buffer(): void
     {
         $b = new Buffer_Stream();
         $b->write('foo');
@@ -54,7 +54,7 @@ class Buffer_Stream_Test extends TestCase
         self::assertSame('abc', $b->read(10));
     }
 
-    public function testExceedingHighwaterMarkReturnsFalseButStillBuffers(): void
+    public function test_exceeding_highwater_mark_returns_false_but_still_buffers(): void
     {
         $b = new Buffer_Stream(5);
         self::assertSame(3, $b->write('hi '));

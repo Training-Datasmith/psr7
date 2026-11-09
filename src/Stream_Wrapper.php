@@ -144,7 +144,7 @@ final class Stream_Wrapper
             return false;
         }
 
-        static $modeMap = [
+        static $mode_map = [
             'r' => 33060,
             'rb' => 33060,
             'r+' => 33206,
@@ -155,7 +155,7 @@ final class Stream_Wrapper
         return [
             'dev' => 0,
             'ino' => 0,
-            'mode' => $modeMap[$this->mode],
+            'mode' => $mode_map[$this->mode],
             'nlink' => 0,
             'uid' => 0,
             'gid' => 0,

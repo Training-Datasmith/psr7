@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 class Inflate_Stream_Test extends TestCase
 {
-    public function testInflatesRfc1952Streams(): void
+    public function test_inflates_rfc1952streams(): void
     {
         $content = gzencode('test');
         $a = Psr7\Utils::stream_for($content);
@@ -22,15 +22,15 @@ class Inflate_Stream_Test extends TestCase
         self::assertSame('test', (string) $b);
     }
 
-    public function testInflatesStreamsRfc1952WithFilename(): void
+    public function test_inflates_streams_rfc1952with_filename(): void
     {
-        $content = $this->getGzipStringWithFilename('test');
+        $content = $this->get_gzip_string_with_filename('test');
         $a = Psr7\Utils::stream_for($content);
         $b = new Inflate_Stream($a);
         self::assertSame('test', (string) $b);
     }
 
-    public function testInflatesRfc1950Streams(): void
+    public function test_inflates_rfc1950streams(): void
     {
         $content = gzcompress('test');
         $a = Psr7\Utils::stream_for($content);
@@ -38,7 +38,7 @@ class Inflate_Stream_Test extends TestCase
         self::assertSame('test', (string) $b);
     }
 
-    public function testInflatesRfc1952StreamsWithExtraFlags(): void
+    public function test_inflates_rfc1952streams_with_extra_flags(): void
     {
         $content = gzdeflate('test'); // RFC 1951. Raw deflate. No header.
 
@@ -65,22 +65,22 @@ class Inflate_Stream_Test extends TestCase
         self::assertSame('test', (string) $b);
     }
 
-    public function testInflatesStreamsPreserveSeekable(): void
+    public function test_inflates_streams_preserve_seekable(): void
     {
         $content = gzencode('test');
         $seekable = Psr7\Utils::stream_for($content);
 
-        $seekableInflate = new Inflate_Stream($seekable);
-        self::assertTrue($seekableInflate->isSeekable());
-        self::assertSame('test', (string) $seekableInflate);
+        $seekable_inflate = new Inflate_Stream($seekable);
+        self::assertTrue($seekable_inflate->isSeekable());
+        self::assertSame('test', (string) $seekable_inflate);
 
-        $nonSeekable = new No_Seek_Stream(Psr7\Utils::stream_for($content));
-        $nonSeekableInflate = new Inflate_Stream($nonSeekable);
-        self::assertFalse($nonSeekableInflate->isSeekable());
-        self::assertSame('test', (string) $nonSeekableInflate);
+        $non_seekable = new No_Seek_Stream(Psr7\Utils::stream_for($content));
+        $non_seekable_inflate = new Inflate_Stream($non_seekable);
+        self::assertFalse($non_seekable_inflate->isSeekable());
+        self::assertSame('test', (string) $non_seekable_inflate);
     }
 
-    private function getGzipStringWithFilename($original_string)
+    private function get_gzip_string_with_filename($original_string)
     {
         $gzipped = bin2hex(gzencode($original_string));
 

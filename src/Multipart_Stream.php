@@ -143,12 +143,12 @@ final class Multipart_Stream implements StreamInterface
     private function add_nested_elements(Append_Stream $stream, array $contents, string $root): void
     {
         foreach ($contents as $key => $value) {
-            $fieldName = $root === '' ? sprintf('[%s]', (string) $key) : sprintf('%s[%s]', $root, (string) $key);
+            $field_name = $root === '' ? sprintf('[%s]', (string) $key) : sprintf('%s[%s]', $root, (string) $key);
 
             if (is_array($value)) {
-                $this->add_nested_elements($stream, $value, $fieldName);
+                $this->add_nested_elements($stream, $value, $field_name);
             } else {
-                $this->add_element($stream, ['name' => $fieldName, 'contents' => $value]);
+                $this->add_element($stream, ['name' => $field_name, 'contents' => $value]);
             }
         }
     }
@@ -194,9 +194,9 @@ final class Multipart_Stream implements StreamInterface
      */
     private static function get_header(array $headers, string $key): ?string
     {
-        $lowercaseHeader = strtolower($key);
+        $lowercase_header = strtolower($key);
         foreach ($headers as $k => $v) {
-            if (strtolower((string) $k) === $lowercaseHeader) {
+            if (strtolower((string) $k) === $lowercase_header) {
                 return $v;
             }
         }

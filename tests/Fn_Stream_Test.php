@@ -13,14 +13,14 @@ use PHPUnit\Framework\TestCase;
  */
 class Fn_Stream_Test extends TestCase
 {
-    public function testThrowsWhenNotImplemented(): void
+    public function test_throws_when_not_implemented(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('seek() is not implemented in the Fn_Stream');
         (new Fn_Stream([]))->seek(1);
     }
 
-    public function testProxiesToFunction(): void
+    public function test_proxies_to_function(): void
     {
         $s = new Fn_Stream([
             'read' => function ($len) {
@@ -33,7 +33,7 @@ class Fn_Stream_Test extends TestCase
         self::assertSame('foo', $s->read(3));
     }
 
-    public function testCanCloseOnDestruct(): void
+    public function test_can_close_on_destruct(): void
     {
         $called = false;
         $s = new Fn_Stream([
@@ -45,14 +45,14 @@ class Fn_Stream_Test extends TestCase
         self::assertTrue($called);
     }
 
-    public function testDoesNotRequireClose(): void
+    public function test_does_not_require_close(): void
     {
         $s = new Fn_Stream([]);
         unset($s);
         self::assertTrue(true); // strict mode requires an assertion
     }
 
-    public function testDecoratesStream(): void
+    public function test_decorates_stream(): void
     {
         $a = Psr7\Utils::stream_for('foo');
         $b = Fn_Stream::decorate($a, []);
@@ -78,7 +78,7 @@ class Fn_Stream_Test extends TestCase
         $b->close();
     }
 
-    public function testDecoratesWithCustomizations(): void
+    public function test_decorates_with_customizations(): void
     {
         $called = false;
         $a = Psr7\Utils::stream_for('foo');
@@ -93,7 +93,7 @@ class Fn_Stream_Test extends TestCase
         self::assertTrue($called);
     }
 
-    public function testDoNotAllowUnserialization(): void
+    public function test_do_not_allow_unserialization(): void
     {
         $a = new Fn_Stream([]);
         $b = serialize($a);
@@ -105,7 +105,7 @@ class Fn_Stream_Test extends TestCase
     /**
      * @requires PHP < 7.4
      */
-    public function testThatConvertingStreamToStringWillTriggerErrorAndWillReturnEmptyString(): void
+    public function test_that_converting_stream_to_string_will_trigger_error_and_will_return_empty_string(): void
     {
         $a = new Fn_Stream([
             '__toString' => function (): void {
@@ -114,8 +114,8 @@ class Fn_Stream_Test extends TestCase
         ]);
 
         $errors = [];
-        set_error_handler(function (int $errorNumber, string $errorMessage) use (&$errors): void {
-            $errors[] = ['number' => $errorNumber, 'message' => $errorMessage];
+        set_error_handler(function (int $error_number, string $error_message) use (&$errors): void {
+            $errors[] = ['number' => $error_number, 'message' => $error_message];
         });
         (string) $a;
 

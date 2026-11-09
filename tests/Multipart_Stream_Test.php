@@ -10,25 +10,25 @@ use PHPUnit\Framework\TestCase;
 
 class Multipart_Stream_Test extends TestCase
 {
-    public function testCreatesDefaultBoundary(): void
+    public function test_creates_default_boundary(): void
     {
         $b = new Multipart_Stream();
         self::assertNotEmpty($b->get_boundary());
     }
 
-    public function testCanProvideBoundary(): void
+    public function test_can_provide_boundary(): void
     {
         $b = new Multipart_Stream([], 'foo');
         self::assertSame('foo', $b->get_boundary());
     }
 
-    public function testIsNotWritable(): void
+    public function test_is_not_writable(): void
     {
         $b = new Multipart_Stream();
         self::assertFalse($b->isWritable());
     }
 
-    public function testCanCreateEmptyStream(): void
+    public function test_can_create_empty_stream(): void
     {
         $b = new Multipart_Stream();
         $boundary = $b->get_boundary();
@@ -36,19 +36,19 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame(strlen($boundary) + 6, $b->getSize());
     }
 
-    public function testValidatesFilesArrayElement(): void
+    public function test_validates_files_array_element(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new Multipart_Stream([['foo' => 'bar']]);
     }
 
-    public function testEnsuresFileHasName(): void
+    public function test_ensures_file_has_name(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new Multipart_Stream([['contents' => 'bar']]);
     }
 
-    public function testThrowsWhenNameIsNotStringOrInt(): void
+    public function test_throws_when_name_is_not_string_or_int(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("The 'name' key must be a string or integer");
@@ -61,7 +61,7 @@ class Multipart_Stream_Test extends TestCase
         ]);
     }
 
-    public function testSerializesFields(): void
+    public function test_serializes_fields(): void
     {
         $b = new Multipart_Stream([
             [
@@ -91,7 +91,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testSerializesNonStringFields(): void
+    public function test_serializes_non_string_fields(): void
     {
         $b = new Multipart_Stream([
             [
@@ -140,7 +140,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testExpandsNestedArrayContents(): void
+    public function test_expands_nested_array_contents(): void
     {
         $b = new Multipart_Stream([
             [
@@ -169,7 +169,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testExpandsFlatArrayContents(): void
+    public function test_expands_flat_array_contents(): void
     {
         $b = new Multipart_Stream([
             [
@@ -200,7 +200,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testExpandsAssociativeArrayContents(): void
+    public function test_expands_associative_array_contents(): void
     {
         $b = new Multipart_Stream([
             [
@@ -226,7 +226,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testExpandsDeeplyNestedArrayContents(): void
+    public function test_expands_deeply_nested_array_contents(): void
     {
         $b = new Multipart_Stream([
             [
@@ -253,7 +253,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testExpandsEmptyArrayContents(): void
+    public function test_expands_empty_array_contents(): void
     {
         $b = new Multipart_Stream([
             [
@@ -267,7 +267,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testExpandsArrayContentsWithMixedScalarTypes(): void
+    public function test_expands_array_contents_with_mixed_scalar_types(): void
     {
         $b = new Multipart_Stream([
             [
@@ -313,7 +313,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testExpandsArrayContentsWithNumericStringKeys(): void
+    public function test_expands_array_contents_with_numeric_string_keys(): void
     {
         $b = new Multipart_Stream([
             [
@@ -339,7 +339,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testThrowsWhenFilenameUsedWithArrayContents(): void
+    public function test_throws_when_filename_used_with_array_contents(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("The 'filename' and 'headers' options cannot be used when 'contents' is an array");
@@ -353,7 +353,7 @@ class Multipart_Stream_Test extends TestCase
         ]);
     }
 
-    public function testThrowsWhenHeadersUsedWithArrayContents(): void
+    public function test_throws_when_headers_used_with_array_contents(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("The 'filename' and 'headers' options cannot be used when 'contents' is an array");
@@ -367,7 +367,7 @@ class Multipart_Stream_Test extends TestCase
         ]);
     }
 
-    public function testExpandsArrayContentsWithZeroName(): void
+    public function test_expands_array_contents_with_zero_name(): void
     {
         $b = new Multipart_Stream([
             [
@@ -388,7 +388,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testExpandsArrayContentsWithIntegerName(): void
+    public function test_expands_array_contents_with_integer_name(): void
     {
         $b = new Multipart_Stream([
             [
@@ -409,7 +409,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testThrowsWhenZeroFilenameUsedWithArrayContents(): void
+    public function test_throws_when_zero_filename_used_with_array_contents(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("The 'filename' and 'headers' options cannot be used when 'contents' is an array");
@@ -423,7 +423,7 @@ class Multipart_Stream_Test extends TestCase
         ]);
     }
 
-    public function testExpandsArrayContentsWithNestedEmptyBranches(): void
+    public function test_expands_array_contents_with_nested_empty_branches(): void
     {
         $b = new Multipart_Stream([
             [
@@ -444,7 +444,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testExpandsArrayContentsWithEmptyStringName(): void
+    public function test_expands_array_contents_with_empty_string_name(): void
     {
         $b = new Multipart_Stream([
             [
@@ -465,7 +465,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testThrowsWhenNullFilenameKeyExistsWithArrayContents(): void
+    public function test_throws_when_null_filename_key_exists_with_array_contents(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("The 'filename' and 'headers' options cannot be used when 'contents' is an array");
@@ -479,7 +479,7 @@ class Multipart_Stream_Test extends TestCase
         ]);
     }
 
-    public function testThrowsWhenEmptyHeadersKeyExistsWithArrayContents(): void
+    public function test_throws_when_empty_headers_key_exists_with_array_contents(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("The 'filename' and 'headers' options cannot be used when 'contents' is an array");
@@ -493,9 +493,9 @@ class Multipart_Stream_Test extends TestCase
         ]);
     }
 
-    public function testExpandsArrayContentsWithStreamLeaves(): void
+    public function test_expands_array_contents_with_stream_leaves(): void
     {
-        $fileStream = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for('file contents'), [
+        $file_stream = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for('file contents'), [
             'getMetadata' => static function (): string {
                 return '/path/to/document.pdf';
             },
@@ -505,7 +505,7 @@ class Multipart_Stream_Test extends TestCase
             [
                 'name' => 'files',
                 'contents' => [
-                    'doc' => $fileStream,
+                    'doc' => $file_stream,
                     'note' => 'plain text',
                 ],
             ],
@@ -529,7 +529,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testSerializesFiles(): void
+    public function test_serializes_files(): void
     {
         $f1 = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for('foo'), [
             'getMetadata' => static function (): string {
@@ -589,10 +589,10 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testSerializesFilesWithMixedNewlines(): void
+    public function test_serializes_files_with_mixed_newlines(): void
     {
         $content = "LF\nCRLF\r\nCR\r";
-        $contentLength = \strlen($content);
+        $content_length = \strlen($content);
 
         $f1 = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for($content), [
             'getMetadata' => static function (): string {
@@ -610,7 +610,7 @@ class Multipart_Stream_Test extends TestCase
         $expected = \implode('', [
             "--boundary\r\n",
             "Content-Disposition: form-data; name=\"newlines\"; filename=\"newlines.txt\"\r\n",
-            "Content-Length: {$contentLength}\r\n",
+            "Content-Length: {$content_length}\r\n",
             "Content-Type: text/plain\r\n",
             "\r\n",
             "{$content}\r\n",
@@ -622,7 +622,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testSerializesFilesWithCustomHeaders(): void
+    public function test_serializes_files_with_custom_headers(): void
     {
         $f1 = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for('foo'), [
             'getMetadata' => static function (): string {
@@ -655,7 +655,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testSerializesFilesWithCustomHeadersAndMultipleValues(): void
+    public function test_serializes_files_with_custom_headers_and_multiple_values(): void
     {
         $f1 = Psr7\Fn_Stream::decorate(Psr7\Utils::stream_for('foo'), [
             'getMetadata' => static function (): string {
@@ -705,7 +705,7 @@ class Multipart_Stream_Test extends TestCase
         self::assertSame($expected, (string) $b);
     }
 
-    public function testCanCreateWithNoneMetadataStreamField(): void
+    public function test_can_create_with_none_metadata_stream_field(): void
     {
         $str = 'dummy text';
         $a = Psr7\Utils::stream_for(static function () use ($str): string {

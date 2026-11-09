@@ -11,7 +11,7 @@ use Psr\Http\Message\StreamInterface;
 
 class Append_Stream_Test extends TestCase
 {
-    public function testValidatesStreamsAreReadable(): void
+    public function test_validates_streams_are_readable(): void
     {
         $a = new Append_Stream();
         $s = $this->createMock(StreamInterface::class);
@@ -23,7 +23,7 @@ class Append_Stream_Test extends TestCase
         $a->add_stream($s);
     }
 
-    public function testValidatesSeekType(): void
+    public function test_validates_seek_type(): void
     {
         $a = new Append_Stream();
         $this->expectException(\RuntimeException::class);
@@ -31,7 +31,7 @@ class Append_Stream_Test extends TestCase
         $a->seek(100, SEEK_CUR);
     }
 
-    public function testTriesToRewindOnSeek(): void
+    public function test_tries_to_rewind_on_seek(): void
     {
         $a = new Append_Stream();
         $s = $this->createMock(StreamInterface::class);
@@ -50,7 +50,7 @@ class Append_Stream_Test extends TestCase
         $a->seek(10);
     }
 
-    public function testSeeksToPositionByReading(): void
+    public function test_seeks_to_position_by_reading(): void
     {
         $a = new Append_Stream([
             Psr7\Utils::stream_for('foo'),
@@ -67,7 +67,7 @@ class Append_Stream_Test extends TestCase
         self::assertSame('baz', $a->read(3));
     }
 
-    public function testDetachWithoutStreams(): void
+    public function test_detach_without_streams(): void
     {
         $s = new Append_Stream();
         $s->detach();
@@ -80,7 +80,7 @@ class Append_Stream_Test extends TestCase
         self::assertFalse($s->isWritable());
     }
 
-    public function testDetachesEachStream(): void
+    public function test_detaches_each_stream(): void
     {
         $handle = fopen('php://temp', 'r');
 
@@ -102,7 +102,7 @@ class Append_Stream_Test extends TestCase
         fclose($handle);
     }
 
-    public function testClosesEachStream(): void
+    public function test_closes_each_stream(): void
     {
         $handle = fopen('php://temp', 'r');
 
@@ -122,7 +122,7 @@ class Append_Stream_Test extends TestCase
         self::assertFalse(is_resource($handle));
     }
 
-    public function testIsNotWritable(): void
+    public function test_is_not_writable(): void
     {
         $a = new Append_Stream([Psr7\Utils::stream_for('foo')]);
         self::assertFalse($a->isWritable());
@@ -133,13 +133,13 @@ class Append_Stream_Test extends TestCase
         $a->write('foo');
     }
 
-    public function testDoesNotNeedStreams(): void
+    public function test_does_not_need_streams(): void
     {
         $a = new Append_Stream();
         self::assertSame('', (string) $a);
     }
 
-    public function testCanReadFromMultipleStreams(): void
+    public function test_can_read_from_multiple_streams(): void
     {
         $a = new Append_Stream([
             Psr7\Utils::stream_for('foo'),
@@ -157,7 +157,7 @@ class Append_Stream_Test extends TestCase
         self::assertSame('foobarbaz', (string) $a);
     }
 
-    public function testCanDetermineSizeFromMultipleStreams(): void
+    public function test_can_determine_size_from_multiple_streams(): void
     {
         $a = new Append_Stream([
             Psr7\Utils::stream_for('foo'),
@@ -179,7 +179,7 @@ class Append_Stream_Test extends TestCase
     /**
      * @requires PHP < 7.4
      */
-    public function testCatchesExceptionsWhenCastingToString(): void
+    public function test_catches_exceptions_when_casting_to_string(): void
     {
         $s = $this->createMock(StreamInterface::class);
         $s->expects(self::once())
@@ -198,8 +198,8 @@ class Append_Stream_Test extends TestCase
         self::assertFalse($a->eof());
 
         $errors = [];
-        set_error_handler(static function (int $errorNumber, string $errorMessage) use (&$errors): bool {
-            $errors[] = ['number' => $errorNumber, 'message' => $errorMessage];
+        set_error_handler(static function (int $error_number, string $error_message) use (&$errors): bool {
+            $errors[] = ['number' => $error_number, 'message' => $error_message];
 
             return true;
         });
@@ -212,7 +212,7 @@ class Append_Stream_Test extends TestCase
         self::assertStringStartsWith('Guzzle_Http\Psr7\Append_Stream::__toString exception:', $errors[0]['message']);
     }
 
-    public function testReturnsEmptyMetadata(): void
+    public function test_returns_empty_metadata(): void
     {
         $s = new Append_Stream();
         self::assertSame([], $s->getMetadata());

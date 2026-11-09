@@ -14,14 +14,14 @@ use PHPUnit\Framework\TestCase;
 class Uri_Comparator_Test extends TestCase
 {
     /**
-     * @dataProvider getCrossOriginExamples
+     * @dataProvider get_cross_origin_examples
      */
-    public function testIsCrossOrigin(string $original, string $modified, bool $expected): void
+    public function test_is_cross_origin(string $original, string $modified, bool $expected): void
     {
         self::assertSame($expected, Uri_Comparator::is_cross_origin(new Uri($original), new Uri($modified)));
     }
 
-    public static function getCrossOriginExamples(): array
+    public static function get_cross_origin_examples(): array
     {
         return [
             ['http://example.com/123', 'http://example.com/', false],

@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 class Server_Request_Test extends TestCase
 {
-    public static function dataNormalizeFiles(): iterable
+    public static function data_normalize_files(): iterable
     {
         return [
             'Single file' => [
@@ -277,23 +277,23 @@ class Server_Request_Test extends TestCase
     }
 
     /**
-     * @dataProvider dataNormalizeFiles
+     * @dataProvider data_normalize_files
      */
-    public function testNormalizeFiles($files, $expected): void
+    public function test_normalize_files($files, $expected): void
     {
         $result = Server_Request::normalize_files($files);
 
         self::assertEquals($expected, $result);
     }
 
-    public function testNormalizeFilesRaisesException(): void
+    public function test_normalize_files_raises_exception(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid value in files specification');
         Server_Request::normalize_files(['test' => 'something']);
     }
 
-    public static function dataGetUriFromGlobals(): iterable
+    public static function data_get_uri_from_globals(): iterable
     {
         $server = [
             'REQUEST_URI' => '/blog/article.php?id=10&user=foo',
@@ -370,16 +370,16 @@ class Server_Request_Test extends TestCase
     }
 
     /**
-     * @dataProvider dataGetUriFromGlobals
+     * @dataProvider data_get_uri_from_globals
      */
-    public function testGetUriFromGlobals($expected, $server_params): void
+    public function test_get_uri_from_globals($expected, $server_params): void
     {
         $_SERVER = $server_params;
 
         self::assertEquals(new Uri($expected), Server_Request::get_uri_from_globals());
     }
 
-    public function testFromGlobals(): void
+    public function test_from_globals(): void
     {
         $_SERVER = [
             'REQUEST_URI' => '/blog/article.php?id=10&user=foo',
@@ -448,7 +448,7 @@ class Server_Request_Test extends TestCase
             $server->getUri()
         );
 
-        $expectedFiles = [
+        $expected_files = [
             'file' => new Uploaded_File(
                 '/tmp/php/php1h4j1o',
                 123,
@@ -458,10 +458,10 @@ class Server_Request_Test extends TestCase
             ),
         ];
 
-        self::assertEquals($expectedFiles, $server->getUploadedFiles());
+        self::assertEquals($expected_files, $server->getUploadedFiles());
     }
 
-    public function testUploaded_Files(): void
+    public function test_uploaded_files(): void
     {
         $request1 = new Server_Request('GET', '/');
 
@@ -476,7 +476,7 @@ class Server_Request_Test extends TestCase
         self::assertSame($files, $request2->getUploadedFiles());
     }
 
-    public function testServerParams(): void
+    public function test_server_params(): void
     {
         $params = ['name' => 'value'];
 
@@ -484,7 +484,7 @@ class Server_Request_Test extends TestCase
         self::assertSame($params, $request->getServerParams());
     }
 
-    public function testCookieParams(): void
+    public function test_cookie_params(): void
     {
         $request1 = new Server_Request('GET', '/');
 
@@ -497,7 +497,7 @@ class Server_Request_Test extends TestCase
         self::assertSame($params, $request2->getCookieParams());
     }
 
-    public function testQueryParams(): void
+    public function test_query_params(): void
     {
         $request1 = new Server_Request('GET', '/');
 
@@ -510,7 +510,7 @@ class Server_Request_Test extends TestCase
         self::assertSame($params, $request2->getQueryParams());
     }
 
-    public function testParsedBody(): void
+    public function test_parsed_body(): void
     {
         $request1 = new Server_Request('GET', '/');
 
@@ -523,7 +523,7 @@ class Server_Request_Test extends TestCase
         self::assertSame($params, $request2->getParsedBody());
     }
 
-    public function testAttributes(): void
+    public function test_attributes(): void
     {
         $request1 = new Server_Request('GET', '/');
 
@@ -551,16 +551,16 @@ class Server_Request_Test extends TestCase
         self::assertSame(['name' => 'value'], $request4->getAttributes());
     }
 
-    public function testNullAttribute(): void
+    public function test_null_attribute(): void
     {
         $request = (new Server_Request('GET', '/'))->withAttribute('name', null);
 
         self::assertSame(['name' => null], $request->getAttributes());
         self::assertNull($request->getAttribute('name', 'different-default'));
 
-        $requestWithoutAttribute = $request->withoutAttribute('name');
+        $request_without_attribute = $request->withoutAttribute('name');
 
-        self::assertSame([], $requestWithoutAttribute->getAttributes());
-        self::assertSame('different-default', $requestWithoutAttribute->getAttribute('name', 'different-default'));
+        self::assertSame([], $request_without_attribute->getAttributes());
+        self::assertSame('different-default', $request_without_attribute->getAttribute('name', 'different-default'));
     }
 }

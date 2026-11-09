@@ -31,14 +31,14 @@ class Caching_Stream_Test extends TestCase
         $this->body->close();
     }
 
-    public function testUsesRemoteSizeIfAvailable(): void
+    public function test_uses_remote_size_if_available(): void
     {
         $body = Psr7\Utils::stream_for('test');
         $caching = new Caching_Stream($body);
         self::assertSame(4, $caching->getSize());
     }
 
-    public function testUsesRemoteSizeIfNotAvailable(): void
+    public function test_uses_remote_size_if_not_available(): void
     {
         $body = new Psr7\Pump_Stream(function () {
             return 'a';
@@ -47,7 +47,7 @@ class Caching_Stream_Test extends TestCase
         self::assertNull($caching->getSize());
     }
 
-    public function testReadsUntilCachedToByte(): void
+    public function test_reads_until_cached_to_byte(): void
     {
         $this->body->seek(5);
         self::assertSame('n', $this->body->read(1));
@@ -55,30 +55,30 @@ class Caching_Stream_Test extends TestCase
         self::assertSame('t', $this->body->read(1));
     }
 
-    public function testCanSeekNearEndWithSeekEnd(): void
+    public function test_can_seek_near_end_with_seek_end(): void
     {
-        $baseStream = Psr7\Utils::stream_for(implode('', range('a', 'z')));
-        $cached = new Caching_Stream($baseStream);
+        $base_stream = Psr7\Utils::stream_for(implode('', range('a', 'z')));
+        $cached = new Caching_Stream($base_stream);
         $cached->seek(-1, SEEK_END);
-        self::assertSame(25, $baseStream->tell());
+        self::assertSame(25, $base_stream->tell());
         self::assertSame('z', $cached->read(1));
         self::assertSame(26, $cached->getSize());
     }
 
-    public function testCanSeekToEndWithSeekEnd(): void
+    public function test_can_seek_to_end_with_seek_end(): void
     {
-        $baseStream = Psr7\Utils::stream_for(implode('', range('a', 'z')));
-        $cached = new Caching_Stream($baseStream);
+        $base_stream = Psr7\Utils::stream_for(implode('', range('a', 'z')));
+        $cached = new Caching_Stream($base_stream);
         $cached->seek(0, SEEK_END);
-        self::assertSame(26, $baseStream->tell());
+        self::assertSame(26, $base_stream->tell());
         self::assertSame('', $cached->read(1));
         self::assertSame(26, $cached->getSize());
     }
 
-    public function testCanUseSeekEndWithUnknownSize(): void
+    public function test_can_use_seek_end_with_unknown_size(): void
     {
-        $baseStream = Psr7\Utils::stream_for('testing');
-        $decorated = Psr7\Fn_Stream::decorate($baseStream, [
+        $base_stream = Psr7\Utils::stream_for('testing');
+        $decorated = Psr7\Fn_Stream::decorate($base_stream, [
             'getSize' => function () {
                 return null;
             },
@@ -88,7 +88,7 @@ class Caching_Stream_Test extends TestCase
         self::assertSame('g', $cached->read(1));
     }
 
-    public function testRewind(): void
+    public function test_rewind(): void
     {
         $a = Psr7\Utils::stream_for('foo');
         $d = new Caching_Stream($a);
@@ -97,7 +97,7 @@ class Caching_Stream_Test extends TestCase
         self::assertSame('foo', $d->read(3));
     }
 
-    public function testCanSeekToReadBytes(): void
+    public function test_can_seek_to_read_bytes(): void
     {
         self::assertSame('te', $this->body->read(2));
         $this->body->seek(0);
@@ -110,7 +110,7 @@ class Caching_Stream_Test extends TestCase
         self::assertSame('ing', $this->body->read(3));
     }
 
-    public function testCanSeekToReadBytesWithPartialBodyReturned(): void
+    public function test_can_seek_to_read_bytes_with_partial_body_returned(): void
     {
         $stream = fopen('php://temp', 'r+');
         fwrite($stream, 'testing');
@@ -137,7 +137,7 @@ class Caching_Stream_Test extends TestCase
         self::assertSame('test', $this->body->read(4));
     }
 
-    public function testWritesToBuffer_Stream(): void
+    public function test_writes_to_buffer_stream(): void
     {
         $this->body->read(2);
         $this->body->write('hi');
@@ -145,7 +145,7 @@ class Caching_Stream_Test extends TestCase
         self::assertSame('tehiing', (string) $this->body);
     }
 
-    public function testSkipsOverwrittenBytes(): void
+    public function test_skips_overwritten_bytes(): void
     {
         $decorated = Psr7\Utils::stream_for(
             implode("\n", array_map(function ($n) {
@@ -182,7 +182,7 @@ class Caching_Stream_Test extends TestCase
         self::assertStringContainsString("0000\nABCD\nTEST\n0003\n0004\n0005\n0006\n1234\n0008\n0009\n", (string) $body);
     }
 
-    public function testClosesBothStreams(): void
+    public function test_closes_both_streams(): void
     {
         $s = fopen('php://temp', 'r');
         $a = Psr7\Utils::stream_for($s);
@@ -191,7 +191,7 @@ class Caching_Stream_Test extends TestCase
         self::assertFalse(is_resource($s));
     }
 
-    public function testEnsuresValidWhence(): void
+    public function test_ensures_valid_whence(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid whence');

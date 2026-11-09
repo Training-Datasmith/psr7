@@ -41,14 +41,14 @@ class Stream_Decorator_Trait_Test extends TestCase
     /**
      * @requires PHP < 7.4
      */
-    public function testCatchesExceptionsWhenCastingToString(): void
+    public function test_catches_exceptions_when_casting_to_string(): void
     {
         $s = $this->createMock(Str::class);
         $s->expects(self::once())
             ->method('read')
             ->willThrowException(new \RuntimeException('foo'));
         $msg = '';
-        set_error_handler(function (int $errNo, string $str) use (&$msg): void {
+        set_error_handler(function (int $err_no, string $str) use (&$msg): void {
             $msg = $str;
         });
         echo new Str($s);
@@ -56,29 +56,29 @@ class Stream_Decorator_Trait_Test extends TestCase
         self::assertStringContainsString('foo', $msg);
     }
 
-    public function testToString(): void
+    public function test_to_string(): void
     {
         self::assertSame('foo', (string) $this->b);
     }
 
-    public function testHasSize(): void
+    public function test_has_size(): void
     {
         self::assertSame(3, $this->b->getSize());
     }
 
-    public function testReads(): void
+    public function test_reads(): void
     {
         self::assertSame('foo', $this->b->read(10));
     }
 
-    public function testCheckMethods(): void
+    public function test_check_methods(): void
     {
         self::assertSame($this->a->isReadable(), $this->b->isReadable());
         self::assertSame($this->a->isWritable(), $this->b->isWritable());
         self::assertSame($this->a->isSeekable(), $this->b->isSeekable());
     }
 
-    public function testSeeksAndTells(): void
+    public function test_seeks_and_tells(): void
     {
         $this->b->seek(1);
         self::assertSame(1, $this->a->tell());
@@ -91,7 +91,7 @@ class Stream_Decorator_Trait_Test extends TestCase
         self::assertSame(3, $this->b->tell());
     }
 
-    public function testGetsContents(): void
+    public function test_gets_contents(): void
     {
         self::assertSame('foo', $this->b->getContents());
         self::assertSame('', $this->b->getContents());
@@ -99,38 +99,38 @@ class Stream_Decorator_Trait_Test extends TestCase
         self::assertSame('oo', $this->b->getContents());
     }
 
-    public function testCloses(): void
+    public function test_closes(): void
     {
         $this->b->close();
         self::assertFalse(is_resource($this->c));
     }
 
-    public function testDetaches(): void
+    public function test_detaches(): void
     {
         $this->b->detach();
         self::assertFalse($this->b->isReadable());
     }
 
-    public function testWrapsMetadata(): void
+    public function test_wraps_metadata(): void
     {
         self::assertSame($this->b->getMetadata(), $this->a->getMetadata());
         self::assertSame($this->b->getMetadata('uri'), $this->a->getMetadata('uri'));
     }
 
-    public function testWrapsWrites(): void
+    public function test_wraps_writes(): void
     {
         $this->b->seek(0, SEEK_END);
         $this->b->write('foo');
         self::assertSame('foofoo', (string) $this->a);
     }
 
-    public function testThrowsWithInvalidGetter(): void
+    public function test_throws_with_invalid_getter(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->b->foo;
     }
 
-    public function testThrowsWhenGetterNotImplemented(): void
+    public function test_throws_when_getter_not_implemented(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $s = new Bad_Stream();

@@ -9,13 +9,13 @@ use PHPUnit\Framework\TestCase;
 
 class Mime_Type_Test extends TestCase
 {
-    public function testDetermineFromExtension(): void
+    public function test_determine_from_extension(): void
     {
         self::assertNull(Psr7\Mime_Type::from_extension('not-a-real-extension'));
         self::assertSame('application/json', Psr7\Mime_Type::from_extension('json'));
     }
 
-    public function testDetermineFromFilename(): void
+    public function test_determine_from_filename(): void
     {
         self::assertSame(
             'image/jpeg',

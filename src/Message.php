@@ -53,7 +53,7 @@ final class Message
      * @param MessageInterface $message    The message to get the body summary
      * @param int              $truncateAt The maximum allowed size of the summary
      */
-    public static function body_summary(MessageInterface $message, int $truncateAt = 120): ?string
+    public static function body_summary(MessageInterface $message, int $truncate_at = 120): ?string
     {
         $body = $message->getBody();
 
@@ -68,10 +68,10 @@ final class Message
         }
 
         $body->rewind();
-        $summary = $body->read($truncateAt);
+        $summary = $body->read($truncate_at);
         $body->rewind();
 
-        if ($size > $truncateAt) {
+        if ($size > $truncate_at) {
             $summary .= ' (truncated...)';
         }
 
@@ -120,34 +120,34 @@ final class Message
 
         $message = ltrim($message, "\r\n");
 
-        $messageParts = preg_split("/\r?\n\r?\n/", $message, 2);
+        $message_parts = preg_split("/\r?\n\r?\n/", $message, 2);
 
-        if ($messageParts === false || count($messageParts) !== 2) {
+        if ($message_parts === false || count($message_parts) !== 2) {
             throw new \InvalidArgumentException('Invalid message: Missing header delimiter');
         }
 
-        [$rawHeaders, $body] = $messageParts;
-        $rawHeaders .= "\r\n"; // Put back the delimiter we split previously
-        $headerParts = preg_split("/\r?\n/", $rawHeaders, 2);
+        [$raw_headers, $body] = $message_parts;
+        $raw_headers .= "\r\n"; // Put back the delimiter we split previously
+        $header_parts = preg_split("/\r?\n/", $raw_headers, 2);
 
-        if ($headerParts === false || count($headerParts) !== 2) {
+        if ($header_parts === false || count($header_parts) !== 2) {
             throw new \InvalidArgumentException('Invalid message: Missing status line');
         }
 
-        [$startLine, $rawHeaders] = $headerParts;
+        [$start_line, $raw_headers] = $header_parts;
 
-        if (preg_match("/(?:^HTTP\/|^[A-Z]+ \S+ HTTP\/)(\d+(?:\.\d+)?)/i", $startLine, $matches) && $matches[1] === '1.0') {
+        if (preg_match("/(?:^HTTP\/|^[A-Z]+ \S+ HTTP\/)(\d+(?:\.\d+)?)/i", $start_line, $matches) && $matches[1] === '1.0') {
             // Header folding is deprecated for HTTP/1.1, but allowed in HTTP/1.0
-            $rawHeaders = preg_replace(Rfc7230::HEADER_FOLD_REGEX, ' ', $rawHeaders);
+            $raw_headers = preg_replace(Rfc7230::HEADER_FOLD_REGEX, ' ', $raw_headers);
         }
 
         /** @var array[] $headerLines */
-        $count = preg_match_all(Rfc7230::HEADER_REGEX, $rawHeaders, $headerLines, PREG_SET_ORDER);
+        $count = preg_match_all(Rfc7230::HEADER_REGEX, $raw_headers, $header_lines, PREG_SET_ORDER);
 
         // If these aren't the same, then one line didn't match and there's an invalid header.
-        if ($count !== substr_count($rawHeaders, "\n")) {
+        if ($count !== substr_count($raw_headers, "\n")) {
             // Folding is deprecated, see https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.4
-            if (preg_match(Rfc7230::HEADER_FOLD_REGEX, $rawHeaders)) {
+            if (preg_match(Rfc7230::HEADER_FOLD_REGEX, $raw_headers)) {
                 throw new \InvalidArgumentException('Invalid header syntax: Obsolete line folding');
             }
 
@@ -156,12 +156,12 @@ final class Message
 
         $headers = [];
 
-        foreach ($headerLines as $headerLine) {
-            $headers[$headerLine[1]][] = $headerLine[2];
+        foreach ($header_lines as $header_line) {
+            $headers[$header_line[1]][] = $header_line[2];
         }
 
         return [
-            'start-line' => $startLine,
+            'start-line' => $start_line,
             'headers' => $headers,
             'body' => $body,
         ];
@@ -175,7 +175,7 @@ final class Message
      */
     public static function parse_request_uri(string $path, array $headers): string
     {
-        $hostKey = array_filter(array_keys($headers), function ($k) {
+        $host_key = array_filter(array_keys($headers), function ($k) {
             // Numeric array keys are converted to int by PHP.
             $k = (string) $k;
 
@@ -183,11 +183,11 @@ final class Message
         });
 
         // If no host is found, then a full URI cannot be constructed.
-        if (!$hostKey) {
+        if (!$host_key) {
             return $path;
         }
 
-        $host = $headers[reset($hostKey)][0];
+        $host = $headers[reset($host_key)][0];
         $scheme = substr($host, -4) === ':443' ? 'https' : 'http';
 
         return $scheme.'://'.$host.'/'.ltrim($path, '/');

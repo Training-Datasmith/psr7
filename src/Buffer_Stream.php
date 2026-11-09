@@ -104,9 +104,9 @@ final class Buffer_Stream implements StreamInterface
      */
     public function read($length): string
     {
-        $currentLength = strlen($this->buffer);
+        $current_length = strlen($this->buffer);
 
-        if ($length >= $currentLength) {
+        if ($length >= $current_length) {
             // No need to slice the buffer because we don't have enough data.
             $result = $this->buffer;
             $this->buffer = '';

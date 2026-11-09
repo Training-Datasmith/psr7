@@ -41,13 +41,13 @@ final class Caching_Stream implements StreamInterface
 
     public function getSize(): ?int
     {
-        $remoteSize = $this->remote_stream->getSize();
+        $remote_size = $this->remote_stream->getSize();
 
-        if (null === $remoteSize) {
+        if (null === $remote_size) {
             return null;
         }
 
-        return max($this->stream->getSize(), $remoteSize);
+        return max($this->stream->getSize(), $remote_size);
     }
 
     public function rewind(): void
@@ -98,18 +98,18 @@ final class Caching_Stream implements StreamInterface
             // been filled from the remote stream, then we must skip bytes on
             // the remote stream to emulate overwriting bytes from that
             // position. This mimics the behavior of other PHP stream wrappers.
-            $remoteData = $this->remote_stream->read(
+            $remote_data = $this->remote_stream->read(
                 $remaining + $this->skip_read_bytes
             );
 
             if ($this->skip_read_bytes) {
-                $len = strlen($remoteData);
-                $remoteData = substr($remoteData, $this->skip_read_bytes);
+                $len = strlen($remote_data);
+                $remote_data = substr($remote_data, $this->skip_read_bytes);
                 $this->skip_read_bytes = max(0, $this->skip_read_bytes - $len);
             }
 
-            $data .= $remoteData;
-            $this->stream->write($remoteData);
+            $data .= $remote_data;
+            $this->stream->write($remote_data);
         }
 
         return $data;

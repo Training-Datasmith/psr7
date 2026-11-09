@@ -154,9 +154,9 @@ final class Uri_Normalizer
         }
 
         if ($flags & self::SORT_QUERY_PARAMETERS && $uri->getQuery() !== '') {
-            $queryKeyValues = explode('&', $uri->getQuery());
-            sort($queryKeyValues);
-            $uri = $uri->withQuery(implode('&', $queryKeyValues));
+            $query_key_values = explode('&', $uri->getQuery());
+            sort($query_key_values);
+            $uri = $uri->withQuery(implode('&', $query_key_values));
         }
 
         return $uri;

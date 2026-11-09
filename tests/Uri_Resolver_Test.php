@@ -17,58 +17,58 @@ class Uri_Resolver_Test extends TestCase
     private const RFC3986_BASE = 'http://a/b/c/d;p?q';
 
     /**
-     * @dataProvider getResolveTestCases
+     * @dataProvider get_resolve_test_cases
      */
-    public function testResolveUri(string $base, string $rel, string $expectedTarget): void
+    public function test_resolve_uri(string $base, string $rel, string $expected_target): void
     {
-        $baseUri = new Uri($base);
-        $targetUri = Uri_Resolver::resolve($baseUri, new Uri($rel));
+        $base_uri = new Uri($base);
+        $target_uri = Uri_Resolver::resolve($base_uri, new Uri($rel));
 
-        self::assertInstanceOf(UriInterface::class, $targetUri);
-        self::assertSame($expectedTarget, (string) $targetUri);
+        self::assertInstanceOf(UriInterface::class, $target_uri);
+        self::assertSame($expected_target, (string) $target_uri);
         // This ensures there are no test cases that only work in the resolve() direction but not the
         // opposite via relativize(). This can happen when both base and rel URI are relative-path
         // references resulting in another relative-path URI.
-        self::assertSame($expectedTarget, (string) Uri_Resolver::resolve($baseUri, $targetUri));
+        self::assertSame($expected_target, (string) Uri_Resolver::resolve($base_uri, $target_uri));
     }
 
     /**
-     * @dataProvider getResolveTestCases
+     * @dataProvider get_resolve_test_cases
      */
-    public function testRelativizeUri(string $base, string $expectedRelativeReference, string $target): void
+    public function test_relativize_uri(string $base, string $expected_relative_reference, string $target): void
     {
-        $baseUri = new Uri($base);
-        $relativeUri = Uri_Resolver::relativize($baseUri, new Uri($target));
+        $base_uri = new Uri($base);
+        $relative_uri = Uri_Resolver::relativize($base_uri, new Uri($target));
 
-        self::assertInstanceOf(UriInterface::class, $relativeUri);
+        self::assertInstanceOf(UriInterface::class, $relative_uri);
         // There are test-cases with too many dot-segments and relative references that are equal like "." == "./".
         // So apart from the same-as condition, this alternative success condition is necessary.
         self::assertTrue(
-            $expectedRelativeReference === (string) $relativeUri
-            || $target === (string) Uri_Resolver::resolve($baseUri, $relativeUri),
+            $expected_relative_reference === (string) $relative_uri
+            || $target === (string) Uri_Resolver::resolve($base_uri, $relative_uri),
             sprintf(
                 '"%s" is not the correct relative reference as it does not resolve to the target URI from the base URI',
-                (string) $relativeUri
+                (string) $relative_uri
             )
         );
     }
 
     /**
-     * @dataProvider getRelativizeTestCases
+     * @dataProvider get_relativize_test_cases
      */
-    public function testRelativizeUriWithUniqueTests(string $base, string $target, string $expectedRelativeReference): void
+    public function test_relativize_uri_with_unique_tests(string $base, string $target, string $expected_relative_reference): void
     {
-        $baseUri = new Uri($base);
-        $targetUri = new Uri($target);
-        $relativeUri = Uri_Resolver::relativize($baseUri, $targetUri);
+        $base_uri = new Uri($base);
+        $target_uri = new Uri($target);
+        $relative_uri = Uri_Resolver::relativize($base_uri, $target_uri);
 
-        self::assertInstanceOf(UriInterface::class, $relativeUri);
-        self::assertSame($expectedRelativeReference, (string) $relativeUri);
+        self::assertInstanceOf(UriInterface::class, $relative_uri);
+        self::assertSame($expected_relative_reference, (string) $relative_uri);
 
-        self::assertSame((string) Uri_Resolver::resolve($baseUri, $targetUri), (string) Uri_Resolver::resolve($baseUri, $relativeUri));
+        self::assertSame((string) Uri_Resolver::resolve($base_uri, $target_uri), (string) Uri_Resolver::resolve($base_uri, $relative_uri));
     }
 
-    public static function getResolveTestCases(): iterable
+    public static function get_resolve_test_cases(): iterable
     {
         return [
             [self::RFC3986_BASE, 'g:h',           'g:h'],
@@ -177,7 +177,7 @@ class Uri_Resolver_Test extends TestCase
     /**
      * Some additional tests to getResolveTestCases() that only make sense for relativize.
      */
-    public static function getRelativizeTestCases(): iterable
+    public static function get_relativize_test_cases(): iterable
     {
         return [
             // targets that are relative-path references are returned as-is

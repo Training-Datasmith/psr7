@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class Pump_Stream_Test extends TestCase
 {
-    public function testHasMetadataAndSize(): void
+    public function test_has_metadata_and_size(): void
     {
         $p = new Pump_Stream(function (): void {
         }, [
@@ -24,7 +24,7 @@ class Pump_Stream_Test extends TestCase
         self::assertSame(100, $p->getSize());
     }
 
-    public function testCanReadFromCallable(): void
+    public function test_can_read_from_callable(): void
     {
         $p = Psr7\Utils::stream_for(function ($size) {
             return 'a';
@@ -35,7 +35,7 @@ class Pump_Stream_Test extends TestCase
         self::assertSame(6, $p->tell());
     }
 
-    public function testStoresExcessDataInBuffer(): void
+    public function test_stores_excess_data_in_buffer(): void
     {
         $called = [];
         $p = Psr7\Utils::stream_for(function ($size) use (&$called) {
@@ -50,7 +50,7 @@ class Pump_Stream_Test extends TestCase
         self::assertSame([1, 9, 3], $called);
     }
 
-    public function testInifiniteStreamWrappedInLimit_Stream(): void
+    public function test_inifinite_stream_wrapped_in_limit_stream(): void
     {
         $p = Psr7\Utils::stream_for(function () {
             return 'a';
@@ -59,7 +59,7 @@ class Pump_Stream_Test extends TestCase
         self::assertSame('aaaaa', (string) $s);
     }
 
-    public function testDescribesCapabilities(): void
+    public function test_describes_capabilities(): void
     {
         $p = Psr7\Utils::stream_for(function (): void {
         });
@@ -83,7 +83,7 @@ class Pump_Stream_Test extends TestCase
     /**
      * @requires PHP < 7.4
      */
-    public function testThatConvertingStreamToStringWillTriggerErrorAndWillReturnEmptyString(): void
+    public function test_that_converting_stream_to_string_will_trigger_error_and_will_return_empty_string(): void
     {
         $p = Psr7\Utils::stream_for(function ($size): void {
             throw new \Exception();
@@ -91,8 +91,8 @@ class Pump_Stream_Test extends TestCase
         self::assertInstanceOf(Pump_Stream::class, $p);
 
         $errors = [];
-        set_error_handler(function (int $errorNumber, string $errorMessage) use (&$errors): void {
-            $errors[] = ['number' => $errorNumber, 'message' => $errorMessage];
+        set_error_handler(function (int $error_number, string $error_message) use (&$errors): void {
+            $errors[] = ['number' => $error_number, 'message' => $error_message];
         });
         (string) $p;
 

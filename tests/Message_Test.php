@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class Message_Test extends TestCase
 {
-    public function testConvertsRequestsToStrings(): void
+    public function test_converts_requests_to_strings(): void
     {
         $request = new Psr7\Request('PUT', 'http://foo.com/hi?123', [
             'Baz' => 'bar',
@@ -22,7 +22,7 @@ class Message_Test extends TestCase
         );
     }
 
-    public function testConvertsResponsesToStrings(): void
+    public function test_converts_responses_to_strings(): void
     {
         $response = new Psr7\Response(200, [
             'Baz' => 'bar',
@@ -34,7 +34,7 @@ class Message_Test extends TestCase
         );
     }
 
-    public function testCorrectlyRendersSetCookieHeadersToString(): void
+    public function test_correctly_renders_set_cookie_headers_to_string(): void
     {
         $response = new Psr7\Response(200, [
             'Set-Cookie' => ['bar', 'baz', 'qux'],
@@ -45,7 +45,7 @@ class Message_Test extends TestCase
         );
     }
 
-    public function testRewindsBody(): void
+    public function test_rewinds_body(): void
     {
         $body = Psr7\Utils::stream_for('abc');
         $res = new Psr7\Response(200, [], $body);
@@ -56,7 +56,7 @@ class Message_Test extends TestCase
         self::assertSame(0, $body->tell());
     }
 
-    public function testThrowsWhenBodyCannotBeRewound(): void
+    public function test_throws_when_body_cannot_be_rewound(): void
     {
         $body = Psr7\Utils::stream_for('abc');
         $body->read(1);
@@ -72,7 +72,7 @@ class Message_Test extends TestCase
         Psr7\Message::rewind_body($res);
     }
 
-    public function testParsesRequestMessages(): void
+    public function test_parses_request_messages(): void
     {
         $req = "GET /abc HTTP/1.0\r\nHost: foo.com\r\nFoo: Bar\r\nBaz: Bam\r\nBaz: Qux\r\n\r\nTest";
         $request = Psr7\Message::parse_request($req);
@@ -86,7 +86,7 @@ class Message_Test extends TestCase
         self::assertSame('http://foo.com/abc', (string) $request->getUri());
     }
 
-    public function testParsesRequestMessagesWithHttpsScheme(): void
+    public function test_parses_request_messages_with_https_scheme(): void
     {
         $req = "PUT /abc?baz=bar HTTP/1.1\r\nHost: foo.com:443\r\n\r\n";
         $request = Psr7\Message::parse_request($req);
@@ -98,7 +98,7 @@ class Message_Test extends TestCase
         self::assertSame('https://foo.com/abc?baz=bar', (string) $request->getUri());
     }
 
-    public function testParsesRequestMessagesWithUriWhenHostIsNotFirst(): void
+    public function test_parses_request_messages_with_uri_when_host_is_not_first(): void
     {
         $req = "PUT / HTTP/1.1\r\nFoo: Bar\r\nHost: foo.com\r\n\r\n";
         $request = Psr7\Message::parse_request($req);
@@ -107,7 +107,7 @@ class Message_Test extends TestCase
         self::assertSame('http://foo.com/', (string) $request->getUri());
     }
 
-    public function testParsesRequestMessagesWithFullUri(): void
+    public function test_parses_request_messages_with_full_uri(): void
     {
         $req = "GET https://www.google.com:443/search?q=foobar HTTP/1.1\r\nHost: www.google.com\r\n\r\n";
         $request = Psr7\Message::parse_request($req);
@@ -119,14 +119,14 @@ class Message_Test extends TestCase
         self::assertSame('https://www.google.com/search?q=foobar', (string) $request->getUri());
     }
 
-    public function testParsesRequestMessagesWithCustomMethod(): void
+    public function test_parses_request_messages_with_custom_method(): void
     {
         $req = "GET_DATA / HTTP/1.1\r\nFoo: Bar\r\nHost: foo.com\r\n\r\n";
         $request = Psr7\Message::parse_request($req);
         self::assertSame('GET_DATA', $request->getMethod());
     }
 
-    public function testParsesRequestMessagesWithNumericHeader(): void
+    public function test_parses_request_messages_with_numeric_header(): void
     {
         $req = "GET /abc HTTP/1.0\r\nHost: foo.com\r\nFoo: Bar\r\nBaz: Bam\r\nBaz: Qux\r\n123: 456\r\n\r\nTest";
         $request = Psr7\Message::parse_request($req);
@@ -141,7 +141,7 @@ class Message_Test extends TestCase
         self::assertSame('http://foo.com/abc', (string) $request->getUri());
     }
 
-    public function testParsesRequestMessagesWithFoldedHeadersOnHttp10(): void
+    public function test_parses_request_messages_with_folded_headers_on_http10(): void
     {
         $req = "PUT / HTTP/1.0\r\nFoo: Bar\r\n Bam\r\n\r\n";
         $request = Psr7\Message::parse_request($req);
@@ -150,7 +150,7 @@ class Message_Test extends TestCase
         self::assertSame('Bar Bam', $request->getHeaderLine('Foo'));
     }
 
-    public function testRequestParsingFailsWithFoldedHeadersOnHttp11(): void
+    public function test_request_parsing_fails_with_folded_headers_on_http11(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid header syntax: Obsolete line folding');
@@ -158,7 +158,7 @@ class Message_Test extends TestCase
         Psr7\Message::parse_response("GET_DATA / HTTP/1.1\r\nFoo: Bar\r\n Biz: Bam\r\n\r\n");
     }
 
-    public function testParsesRequestMessagesWhenHeaderDelimiterIsOnlyALineFeed(): void
+    public function test_parses_request_messages_when_header_delimiter_is_only_a_line_feed(): void
     {
         $req = "PUT / HTTP/1.0\nFoo: Bar\nBaz: Bam\n\n";
         $request = Psr7\Message::parse_request($req);
@@ -168,14 +168,14 @@ class Message_Test extends TestCase
         self::assertSame('Bam', $request->getHeaderLine('Baz'));
     }
 
-    public function testValidatesRequestMessages(): void
+    public function test_validates_request_messages(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
         Psr7\Message::parse_request("HTTP/1.1 200 OK\r\n\r\n");
     }
 
-    public function testParsesResponseMessages(): void
+    public function test_parses_response_messages(): void
     {
         $res = "HTTP/1.0 200 OK\r\nFoo: Bar\r\nBaz: Bam\r\nBaz: Qux\r\n\r\nTest";
         $response = Psr7\Message::parse_response($res);
@@ -187,7 +187,7 @@ class Message_Test extends TestCase
         self::assertSame('Test', (string) $response->getBody());
     }
 
-    public function testParsesResponseWithoutReason(): void
+    public function test_parses_response_without_reason(): void
     {
         $res = "HTTP/1.0 200\r\nFoo: Bar\r\nBaz: Bam\r\nBaz: Qux\r\n\r\nTest";
         $response = Psr7\Message::parse_response($res);
@@ -199,7 +199,7 @@ class Message_Test extends TestCase
         self::assertSame('Test', (string) $response->getBody());
     }
 
-    public function testParsesResponseWithLeadingDelimiter(): void
+    public function test_parses_response_with_leading_delimiter(): void
     {
         $res = "\r\nHTTP/1.0 200\r\nFoo: Bar\r\n\r\nTest";
         $response = Psr7\Message::parse_response($res);
@@ -210,7 +210,7 @@ class Message_Test extends TestCase
         self::assertSame('Test', (string) $response->getBody());
     }
 
-    public function testParsesResponseWithFoldedHeadersOnHttp10(): void
+    public function test_parses_response_with_folded_headers_on_http10(): void
     {
         $res = "HTTP/1.0 200\r\nFoo: Bar\r\n Bam\r\n\r\nTest";
         $response = Psr7\Message::parse_response($res);
@@ -221,14 +221,14 @@ class Message_Test extends TestCase
         self::assertSame('Test', (string) $response->getBody());
     }
 
-    public function testResponseParsingFailsWithFoldedHeadersOnHttp11(): void
+    public function test_response_parsing_fails_with_folded_headers_on_http11(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid header syntax: Obsolete line folding');
         Psr7\Message::parse_response("HTTP/1.1 200\r\nFoo: Bar\r\n Biz: Bam\r\nBaz: Qux\r\n\r\nTest");
     }
 
-    public function testParsesResponseWhenHeaderDelimiterIsOnlyALineFeed(): void
+    public function test_parses_response_when_header_delimiter_is_only_a_line_feed(): void
     {
         $res = "HTTP/1.0 200\nFoo: Bar\nBaz: Bam\n\nTest\n\nOtherTest";
         $response = Psr7\Message::parse_response($res);
@@ -240,58 +240,58 @@ class Message_Test extends TestCase
         self::assertSame("Test\n\nOtherTest", (string) $response->getBody());
     }
 
-    public function testResponseParsingFailsWithoutHeaderDelimiter(): void
+    public function test_response_parsing_fails_without_header_delimiter(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid message: Missing header delimiter');
         Psr7\Message::parse_response("HTTP/1.0 200\r\nFoo: Bar\r\n Baz: Bam\r\nBaz: Qux\r\n");
     }
 
-    public function testValidatesResponseMessages(): void
+    public function test_validates_response_messages(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         Psr7\Message::parse_response("GET / HTTP/1.1\r\n\r\n");
     }
 
-    public function testMessageBodySummaryWithSmallBody(): void
+    public function test_message_body_summary_with_small_body(): void
     {
         $message = new Psr7\Response(200, [], 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.');
         self::assertSame('Lorem ipsum dolor sit amet, consectetur adipiscing elit.', Psr7\Message::body_summary($message));
     }
 
-    public function testMessageBodySummaryWithLargeBody(): void
+    public function test_message_body_summary_with_large_body(): void
     {
         $message = new Psr7\Response(200, [], 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.');
         self::assertSame('Lorem ipsu (truncated...)', Psr7\Message::body_summary($message, 10));
     }
 
-    public function testMessageBodySummaryWithSpecialUTF8Characters(): void
+    public function test_message_body_summary_with_special_utf8characters(): void
     {
         $message = new Psr7\Response(200, [], '’é€௵ဪ‱');
         self::assertSame('’é€௵ဪ‱', Psr7\Message::body_summary($message));
     }
 
-    public function testMessageBodySummaryWithSpecialUTF8CharactersAndLargeBody(): void
+    public function test_message_body_summary_with_special_utf8characters_and_large_body(): void
     {
         $message = new Psr7\Response(200, [], '🤦🏾‍♀️');
         // The first Unicode codepoint of the body has four bytes.
         self::assertNull(Psr7\Message::body_summary($message, 3));
     }
 
-    public function testMessageBodySummaryWithEmptyBody(): void
+    public function test_message_body_summary_with_empty_body(): void
     {
         $message = new Psr7\Response(200, [], '');
         self::assertNull(Psr7\Message::body_summary($message));
     }
 
-    public function testMessageBodySummaryNotInitiallyRewound(): void
+    public function test_message_body_summary_not_initially_rewound(): void
     {
         $message = new Psr7\Response(200, [], 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.');
         $message->getBody()->read(10);
         self::assertSame('Lorem ipsu (truncated...)', Psr7\Message::body_summary($message, 10));
     }
 
-    public function testGetResponseBodySummaryOfNonReadableStream(): void
+    public function test_get_response_body_summary_of_non_readable_stream(): void
     {
         $message = new Psr7\Response(500, [], new Read_Seek_Only_Stream());
         self::assertNull(Psr7\Message::body_summary($message));

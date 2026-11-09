@@ -44,20 +44,20 @@ final class Utils
      *
      * @throws \RuntimeException on error.
      */
-    public static function copy_to_stream(StreamInterface $source, StreamInterface $dest, int $maxLen = -1): void
+    public static function copy_to_stream(StreamInterface $source, StreamInterface $dest, int $max_len = -1): void
     {
-        $bufferSize = 8192;
+        $buffer_size = 8192;
 
-        if ($maxLen === -1) {
+        if ($max_len === -1) {
             while (!$source->eof()) {
-                if (!$dest->write($source->read($bufferSize))) {
+                if (!$dest->write($source->read($buffer_size))) {
                     break;
                 }
             }
         } else {
-            $remaining = $maxLen;
+            $remaining = $max_len;
             while ($remaining > 0 && !$source->eof()) {
-                $buf = $source->read(min($bufferSize, $remaining));
+                $buf = $source->read(min($buffer_size, $remaining));
                 $len = strlen($buf);
                 if (!$len) {
                     break;
@@ -78,11 +78,11 @@ final class Utils
      *
      * @throws \RuntimeException on error.
      */
-    public static function copy_to_string(StreamInterface $stream, int $maxLen = -1): string
+    public static function copy_to_string(StreamInterface $stream, int $max_len = -1): string
     {
         $buffer = '';
 
-        if ($maxLen === -1) {
+        if ($max_len === -1) {
             while (!$stream->eof()) {
                 $buf = $stream->read(1048576);
                 if ($buf === '') {
@@ -95,8 +95,8 @@ final class Utils
         }
 
         $len = 0;
-        while (!$stream->eof() && $len < $maxLen) {
-            $buf = $stream->read($maxLen - $len);
+        while (!$stream->eof() && $len < $max_len) {
+            $buf = $stream->read($max_len - $len);
             if ($buf === '') {
                 break;
             }
@@ -119,7 +119,7 @@ final class Utils
      *
      * @throws \RuntimeException on error.
      */
-    public static function hash(StreamInterface $stream, string $algo, bool $rawOutput = false): string
+    public static function hash(StreamInterface $stream, string $algo, bool $raw_output = false): string
     {
         $pos = $stream->tell();
 
@@ -132,7 +132,7 @@ final class Utils
             hash_update($ctx, $stream->read(1048576));
         }
 
-        $out = hash_final($ctx, $rawOutput);
+        $out = hash_final($ctx, $raw_output);
         $stream->seek($pos);
 
         return $out;
@@ -172,9 +172,9 @@ final class Utils
                 $changes['set_headers']['Host'] = $host;
 
                 if ($port = $changes['uri']->getPort()) {
-                    $standardPorts = ['http' => 80, 'https' => 443];
+                    $standard_ports = ['http' => 80, 'https' => 443];
                     $scheme = $changes['uri']->getScheme();
-                    if (isset($standardPorts[$scheme]) && $port != $standardPorts[$scheme]) {
+                    if (isset($standard_ports[$scheme]) && $port != $standard_ports[$scheme]) {
                         $changes['set_headers']['Host'] .= ':'.$port;
                     }
                 }

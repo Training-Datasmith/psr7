@@ -15,7 +15,7 @@ use Psr\Http\Message\StreamInterface;
  */
 class Stream_Wrapper_Test extends TestCase
 {
-    public function testResource(): void
+    public function test_resource(): void
     {
         $stream = Utils::stream_for('foo');
         $handle = Stream_Wrapper::get_resource($stream);
@@ -27,7 +27,7 @@ class Stream_Wrapper_Test extends TestCase
         self::assertSame('', fread($handle, 1));
         self::assertTrue(feof($handle));
 
-        $stBlksize = defined('PHP_WINDOWS_VERSION_BUILD') ? -1 : 0;
+        $st_blksize = defined('PHP_WINDOWS_VERSION_BUILD') ? -1 : 0;
 
         self::assertEquals([
             'dev' => 0,
@@ -41,8 +41,8 @@ class Stream_Wrapper_Test extends TestCase
             'atime' => 0,
             'mtime' => 0,
             'ctime' => 0,
-            'blksize' => $stBlksize,
-            'blocks' => $stBlksize,
+            'blksize' => $st_blksize,
+            'blocks' => $st_blksize,
             0 => 0,
             1 => 0,
             2 => 33206,
@@ -54,22 +54,22 @@ class Stream_Wrapper_Test extends TestCase
             8 => 0,
             9 => 0,
             10 => 0,
-            11 => $stBlksize,
-            12 => $stBlksize,
+            11 => $st_blksize,
+            12 => $st_blksize,
         ], fstat($handle));
 
         self::assertTrue(fclose($handle));
         self::assertSame('foobar', (string) $stream);
     }
 
-    public function testStreamContext(): void
+    public function test_stream_context(): void
     {
         $stream = Utils::stream_for('foo');
 
         self::assertSame('foo', file_get_contents('guzzle://stream', false, Stream_Wrapper::create_stream_context($stream)));
     }
 
-    public function testStreamCast(): void
+    public function test_stream_cast(): void
     {
         $streams = [
             Stream_Wrapper::get_resource(Utils::stream_for('foo')),
@@ -80,7 +80,7 @@ class Stream_Wrapper_Test extends TestCase
         self::assertIsInt(stream_select($streams, $write, $except, 0));
     }
 
-    public function testValidatesStream(): void
+    public function test_validates_stream(): void
     {
         $stream = $this->createMock(StreamInterface::class);
         $stream->expects(self::once())
@@ -94,13 +94,13 @@ class Stream_Wrapper_Test extends TestCase
         Stream_Wrapper::get_resource($stream);
     }
 
-    public function testReturnsFalseWhenStreamDoesNotExist(): void
+    public function test_returns_false_when_stream_does_not_exist(): void
     {
         $result = @fopen('guzzle://foo', 'r');
         self::assertFalse($result);
     }
 
-    public function testCanOpenReadonlyStream(): void
+    public function test_can_open_readonly_stream(): void
     {
         $stream = $this->createMock(StreamInterface::class);
         $stream->expects(self::once())
@@ -114,11 +114,11 @@ class Stream_Wrapper_Test extends TestCase
         fclose($r);
     }
 
-    public function testUrlStat(): void
+    public function test_url_stat(): void
     {
         Stream_Wrapper::register();
 
-        $stBlksize = defined('PHP_WINDOWS_VERSION_BUILD') ? -1 : 0;
+        $st_blksize = defined('PHP_WINDOWS_VERSION_BUILD') ? -1 : 0;
 
         self::assertEquals(
             [
@@ -133,8 +133,8 @@ class Stream_Wrapper_Test extends TestCase
                 'atime' => 0,
                 'mtime' => 0,
                 'ctime' => 0,
-                'blksize' => $stBlksize,
-                'blocks' => $stBlksize,
+                'blksize' => $st_blksize,
+                'blocks' => $st_blksize,
                 0 => 0,
                 1 => 0,
                 2 => 0,
@@ -146,8 +146,8 @@ class Stream_Wrapper_Test extends TestCase
                 8 => 0,
                 9 => 0,
                 10 => 0,
-                11 => $stBlksize,
-                12 => $stBlksize,
+                11 => $st_blksize,
+                12 => $st_blksize,
             ],
             stat('guzzle://stream')
         );
@@ -156,7 +156,7 @@ class Stream_Wrapper_Test extends TestCase
     /**
      * @requires extension xmlreader
      */
-    public function testXmlReaderWithStream(): void
+    public function test_xml_reader_with_stream(): void
     {
         $stream = Utils::stream_for('<?xml version="1.0" encoding="utf-8"?><foo />');
 
@@ -172,7 +172,7 @@ class Stream_Wrapper_Test extends TestCase
     /**
      * @requires extension xmlreader
      */
-    public function testXmlWriterWithStream(): void
+    public function test_xml_writer_with_stream(): void
     {
         $stream = Utils::stream_for(fopen('php://memory', 'wb'));
 
@@ -189,12 +189,12 @@ class Stream_Wrapper_Test extends TestCase
         self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><foo />', (string) $stream);
     }
 
-    public function testWrappedNullSizedStreamStaysNullSized(): void
+    public function test_wrapped_null_sized_stream_stays_null_sized(): void
     {
-        $nullSizedStream = new Psr7\Pump_Stream(function () { return ''; });
-        $this->assertNull($nullSizedStream->getSize());
+        $null_sized_stream = new Psr7\Pump_Stream(function () { return ''; });
+        $this->assertNull($null_sized_stream->getSize());
 
-        $resource = Stream_Wrapper::get_resource($nullSizedStream);
+        $resource = Stream_Wrapper::get_resource($null_sized_stream);
         $stream = Utils::stream_for($resource);
 
         $this->assertNull($stream->getSize());

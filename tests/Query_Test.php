@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class Query_Test extends TestCase
 {
-    public static function parseQueryProvider()
+    public static function parse_query_provider()
     {
         return [
             // Does not need to parse when the string is empty
@@ -51,15 +51,15 @@ class Query_Test extends TestCase
     }
 
     /**
-     * @dataProvider parseQueryProvider
+     * @dataProvider parse_query_provider
      */
-    public function testParsesQueries($input, $output): void
+    public function test_parses_queries($input, $output): void
     {
         $result = Psr7\Query::parse($input);
         self::assertSame($output, $result);
     }
 
-    public function testDoesNotDecode(): void
+    public function test_does_not_decode(): void
     {
         $str = 'foo%20=bar';
         $data = Psr7\Query::parse($str, false);
@@ -67,33 +67,33 @@ class Query_Test extends TestCase
     }
 
     /**
-     * @dataProvider parseQueryProvider
+     * @dataProvider parse_query_provider
      */
-    public function testParsesAndBuildsQueries($input): void
+    public function test_parses_and_builds_queries($input): void
     {
         $result = Psr7\Query::parse($input, false);
         self::assertSame($input, Psr7\Query::build($result, false));
     }
 
-    public function testEncodesWithRfc1738(): void
+    public function test_encodes_with_rfc1738(): void
     {
         $str = Psr7\Query::build(['foo bar' => 'baz+'], PHP_QUERY_RFC1738);
         self::assertSame('foo+bar=baz%2B', $str);
     }
 
-    public function testEncodesWithRfc3986(): void
+    public function test_encodes_with_rfc3986(): void
     {
         $str = Psr7\Query::build(['foo bar' => 'baz+'], PHP_QUERY_RFC3986);
         self::assertSame('foo%20bar=baz%2B', $str);
     }
 
-    public function testDoesNotEncode(): void
+    public function test_does_not_encode(): void
     {
         $str = Psr7\Query::build(['foo bar' => 'baz+'], false);
         self::assertSame('foo bar=baz+', $str);
     }
 
-    public function testCanControlDecodingType(): void
+    public function test_can_control_decoding_type(): void
     {
         $result = Psr7\Query::parse('var=foo+bar', PHP_QUERY_RFC3986);
         self::assertSame('foo+bar', $result['var']);
@@ -101,7 +101,7 @@ class Query_Test extends TestCase
         self::assertSame('foo bar', $result['var']);
     }
 
-    public function testBuildBooleans(): void
+    public function test_build_booleans(): void
     {
         $data = [
             'true' => true,
